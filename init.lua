@@ -5,7 +5,8 @@ minetest.debug("CivMisc initializing...")
 
 local groundcollect = dofile(modpath .. "groundcollect.lua")
 
+local knockback = dofile(modpath .. "knockback.lua")
+
 local sneakbob = dofile(modpath .. "sneakbob.lua")
 
 minetest.debug("CivMisc initialised.")
-
