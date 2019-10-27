@@ -9,4 +9,6 @@ local knockback = dofile(modpath .. "knockback.lua")
 
 local sneakbob = dofile(modpath .. "sneakbob.lua")
 
+local minimap = dofile(modpath .. "minimap.lua")
+
 minetest.debug("CivMisc initialised.")
