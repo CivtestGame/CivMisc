@@ -24,10 +24,10 @@ minetest.register_chatcommand("shutdown_safe", {
       for n, entry in ipairs(cleanup.actions) do
          local func = entry.func
          local description = entry.description
-         local cleanup_successful, description = func()
-         minetest.log("Clean up of [" .. description .. "] "
+         local cleanup_successful, msg = func()
+         minetest.log("Cleanup of [" .. description .. "] "
                          .. (cleanup_successful and "SUCCESS") or "FAILED"
-                         .. (description and (" (" .. description .. ")")) or "")
+                         .. (msg and (" (" .. msg .. ")")) or "")
          total_count = total_count + 1
          if cleanup_successful then
             success_count = success_count + 1
