@@ -11,4 +11,6 @@ local sneakbob = dofile(modpath .. "sneakbob.lua")
 
 local minimap = dofile(modpath .. "minimap.lua")
 
+local cleanup = dofile(modpath .. "cleanup.lua")
+
 minetest.debug("CivMisc initialised.")
