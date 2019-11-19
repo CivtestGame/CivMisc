@@ -13,4 +13,6 @@ local minimap = dofile(modpath .. "minimap.lua")
 
 local cleanup = dofile(modpath .. "cleanup.lua")
 
+local spawnutils = dofile(modpath .. "spawnutils.lua")
+
 minetest.debug("CivMisc initialised.")
