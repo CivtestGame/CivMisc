@@ -15,4 +15,6 @@ local cleanup = dofile(modpath .. "cleanup.lua")
 
 local spawnutils = dofile(modpath .. "spawnutils.lua")
 
+local worldborder = dofile(modpath .. "worldborder.lua")
+
 minetest.debug("CivMisc initialised.")
