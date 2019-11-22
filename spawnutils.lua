@@ -20,7 +20,6 @@ local function groundLevel(targetX,targetZ)
    for i = 96, -100, -1 do
       local p = {x=targetX, y=i, z=targetZ}
       local node = get_far_node(p)
-      minetest.log("node name: " .. node.name)
       if node.name ~= "air" and node.name ~= "ignore" then
          groundLevel = i
          break
@@ -79,7 +78,6 @@ minetest.register_on_respawnplayer(function(player)
       local pos = beds.spawn[pname]
       local node = get_far_node(pos)
       local node_name = node.name
-      minetest.log("node name: "..node_name)
       if pos and (node_name == "beds:bed_bottom"
                      or node_name == "beds:bed_top"
                      or node_name == "beds:fancy_bed_bottom"
