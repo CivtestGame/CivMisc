@@ -88,8 +88,24 @@ minetest.register_on_respawnplayer(function(player)
          player:set_pos(pos)
       else
          random_spawn(player)
-         minetest.chat_send_player(pname, "You wake up in an unfamiliar place.")
+         minetest.chat_send_player(pname, "You wake up in an unfamiliar place...")
       end
 end)
+
+
+minetest.register_on_newplayer(function(player)
+      local pname = player:get_player_name()
+      random_spawn(player)
+      minetest.after(
+         3,
+         function(pname)
+            minetest.chat_send_player(
+               pname,
+               "You wake up in an unfamiliar place..."
+            )
+         end,
+         pname)
+end)
+
 
 minetest.debug("[CivMisc] SpawnUtils initialised.")
