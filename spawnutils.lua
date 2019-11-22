@@ -10,66 +10,92 @@ local function get_far_node(pos)
    return node
 end
 
--- From https://forum.minetest.net/viewtopic.php?f=9&t=9286
-local function groundLevel(targetX,targetZ)
-   local manip = minetest.get_voxel_manip()   -- the voxel_manip is require to force loading of the block
+local SPAWN_GROUND_NOT_FOUND = "ground_not_found"
+local SPAWN_AREA_NOT_EMERGED = "aread_not_emerged"
 
-   local groundLevel = nil
-   local i
-   -- This will fail if ground level is 100 or above or below below -100 (but this doesn't happen very often)
-   for i = 96, -100, -1 do
-      local p = {x=targetX, y=i, z=targetZ}
-      local node = get_far_node(p)
-      if node.name ~= "air" and node.name ~= "ignore" then
-         groundLevel = i
-         break
+-- Adapted from https://forum.minetest.net/viewtopic.php?f=9&t=9286
+local function get_ground_level(target_x, target_z)
+   -- Search from y=100 to y=-100
+   for i = 100, -100, -1 do
+      local pos = { x = target_x, y = i, z = target_z }
+      local node = get_far_node(pos)
+      -- Area isn't emerged, return nil and the reason
+      if node.name == "ignore" then
+         return nil, SPAWN_AREA_NOT_EMERGED
+      elseif node.name ~= "air" then
+         -- We found a suitable candidate...
+         if node.name == "default:water_source" then
+            -- Oh, it's watery. The ocean is not suitable for a spawn...
+            break
+         end
+         -- Success, return the position with a little y bump
+         return { x = target_x, y = i + 1, z = target_z }
       end
    end
-   if groundLevel ~= nil then
-      -- Search Successful
-      return {x=targetX, y=groundLevel, z=targetZ}
-   else
-      -- Search Failed
-      print("groundLevel Search Failed. Groundlevel could be deeper than -100")
-      return nil
-   end
+   -- Search failed for whatever reason
+   return nil, SPAWN_GROUND_NOT_FOUND
+end
+
+local function get_random_xz_in_circle(radius)
+   local a = math.random() * 2 * math.pi
+   local r = radius * math.sqrt(math.random())
+
+   local x = math.floor(r * math.cos(a))
+   local z = math.floor(r * math.sin(a))
+
+   return x, z
 end
 
 -- TODO: config this
-local randomSpawnMinX = -500
-local randomSpawnMaxX = 500
-local randomSpawnMinZ = -500
-local randomSpawnMaxZ = 500
+local random_spawn_radius = 750
 
-function random_spawn(player)
-   -- Slight hack: make it so the player is floating somewhere until after we've
-   -- loaded the mapblock.
-   player:set_pos({x=9999, y=9999, z=9999})
+local function try_random_spawn(player, x, z)
+   -- Ensure we have coordinates to try to spawn the player at. Generate random
+   -- ones if none are supplied.
+   local rx, rz = x, z
+   if rx == nil or rz == nil then
+       rx, rz = get_random_xz_in_circle(random_spawn_radius)
+   end
+   -- Get the ground level at these coordinates, or a reason we failed to do this.
+   local ground_vector, reason = get_ground_level(rx, rz)
 
-   -- Find some appropriate airy place to randomly spawn a player.
-   local rx = math.random(randomSpawnMinX, randomSpawnMaxX)
-   local rz = math.random(randomSpawnMinZ, randomSpawnMaxZ)
-   local ground_vector = groundLevel(rx, rz)
-   -- ground_vector is nil if the mapblock hasn't yet been generated. Force
-   -- generate the area, recompute the y level, and place the player there.
-
-   -- If ground_vector is non-nil, it's a valid, already-generated location, so
-   -- we're fine to use it.
-   if not ground_vector then
+   -- If we found the ground location, success! Spawn the player there.
+   if ground_vector then
+      player:set_pos(ground_vector)
+    -- If no suitable location was found, try again elsewhere...
+   elseif reason == SPAWN_GROUND_NOT_FOUND then
+      try_random_spawn(player)
+    -- If the mapblock wasn't emerged/generated, emerge it, and try again with
+    -- the same coordinates.
+   elseif reason == SPAWN_AREA_NOT_EMERGED then
       minetest.emerge_area(
          vector.new(rx, -100, rz),
          vector.new(rx, 100, rz),
          function(blockpos, action, calls_remaining, param)
             if calls_remaining < 1 then
-               local new_ground_vector = groundLevel(rx, rz)
-               player:set_pos(new_ground_vector)
+               try_random_spawn(player, rx, rz)
             end
          end
       )
-   else
-      player:set_pos(ground_vector)
    end
-   return
+end
+
+local function random_spawn(player)
+   local pname = player:get_player_name()
+   -- Temporarily send the player to the sky until we get a spawn point
+   player:set_pos({x=math.random(-100, 100), y=9999, z=math.random(-100, 100)})
+
+   -- Then, randomspawn the player, and send a pleasant message
+   try_random_spawn(player)
+   minetest.after(
+      3,
+      function(pname)
+         minetest.chat_send_player(
+            pname,
+            "You wake up in an unfamiliar place..."
+         )
+      end,
+      pname)
 end
 
 -- Respawn player at bed if it still exists. If not, randomspawn them.
@@ -86,23 +112,12 @@ minetest.register_on_respawnplayer(function(player)
          player:set_pos(pos)
       else
          random_spawn(player)
-         minetest.chat_send_player(pname, "You wake up in an unfamiliar place...")
       end
 end)
 
 
 minetest.register_on_newplayer(function(player)
-      local pname = player:get_player_name()
       random_spawn(player)
-      minetest.after(
-         3,
-         function(pname)
-            minetest.chat_send_player(
-               pname,
-               "You wake up in an unfamiliar place..."
-            )
-         end,
-         pname)
 end)
 
 
