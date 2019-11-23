@@ -17,4 +17,6 @@ local spawnutils = dofile(modpath .. "spawnutils.lua")
 
 local worldborder = dofile(modpath .. "worldborder.lua")
 
+local chat = dofile(modpath .. "chat.lua")
+
 minetest.debug("CivMisc initialised.")
