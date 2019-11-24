@@ -19,4 +19,6 @@ local worldborder = dofile(modpath .. "worldborder.lua")
 
 local chat = dofile(modpath .. "chat.lua")
 
+local damagemod = dofile(modpath .. "damagemod.lua")
+
 minetest.debug("CivMisc initialised.")
