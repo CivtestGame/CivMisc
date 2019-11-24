@@ -46,4 +46,27 @@ function minetest.is_protected(pos, name)
    return old_is_protected(pos, name)
 end
 
+
+local boats_loaded = minetest.get_modpath("boats")
+
+if boats_loaded then
+   minetest.log("WorldBorder is aware of the 'boats' plugin.")
+
+   -- Stop boats from exceeding the world border
+   local old_boat_on_step = minetest.registered_entities["boats:boat"].on_step
+   minetest.registered_entities["boats:boat"].on_step = function(self, dtime)
+      old_boat_on_step(self, dtime)
+      local pos = self.object:get_pos()
+      if not position_in_world_border(pos) then
+         local new_pos = get_closest_position_in_border(pos)
+         self.object:set_pos(new_pos)
+
+         local velocity = self.object:get_velocity()
+         local acceleration = self.object:get_acceleration()
+         self.object:set_velocity(vector.multiply(velocity, -1))
+         self.object:set_acceleration(vector.multiply(acceleration, -1))
+      end
+   end
+
+end
 minetest.debug("[CivMisc] WorldBorder initialised.")
