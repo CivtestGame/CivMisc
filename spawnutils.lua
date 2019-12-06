@@ -102,14 +102,18 @@ end
 minetest.register_on_respawnplayer(function(player)
       local pname = player:get_player_name()
       local pos = beds.spawn[pname]
-      local node = get_far_node(pos)
-      local node_name = node.name
-      if pos and (node_name == "beds:bed_bottom"
+      if pos then
+         local node = get_far_node(pos)
+         local node_name = node.name
+         if (node_name == "beds:bed_bottom"
                      or node_name == "beds:bed_top"
                      or node_name == "beds:fancy_bed_bottom"
                      or node_name == "beds:fancy_bed_top")
-      then
-         player:set_pos(pos)
+         then
+            player:set_pos(pos)
+         else
+            random_spawn(player)
+         end
       else
          random_spawn(player)
       end
