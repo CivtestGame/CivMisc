@@ -21,4 +21,6 @@ local chat = dofile(modpath .. "chat.lua")
 
 local damagemod = dofile(modpath .. "damagemod.lua")
 
+local rectifications = dofile(modpath .. "rectifications.lua")
+
 minetest.debug("CivMisc initialised.")
