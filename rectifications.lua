@@ -42,22 +42,16 @@ end
 
 function enable_global_oddly_breakable_by_hand()
    for name,def in pairs(core.registered_nodes) do
-      if name and
-         (name ~= "bedrock:bedrock"
-             or name ~= "air:air"
-             or not name:find("water")) then
-            if name == "default:stone" then
-               minetest.log ("1: " .. name)
-            end
-            if def
-            and def.groups
-            and not def.groups['oddly_breakable_by_hand'] then
-               def.groups.oddly_breakable_by_hand = 1
-               if name == "default:stone" then
-                  minetest.log("2: " .. dump(def.groups))
-               end
-               minetest.register_node(":" .. name, def)
-            end
+      if name ~= "bedrock:bedrock"
+         and name ~= "air:air"
+         and not name:find("water")
+      then
+         if def.groups
+            and not def.groups.oddly_breakable_by_hand
+         then
+            def.groups.oddly_breakable_by_hand = 1
+            minetest.register_node(":" .. name, def)
+         end
       end
    end
 end
