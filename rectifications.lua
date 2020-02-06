@@ -18,8 +18,9 @@ function disable_xdecor_enderchest()
 end
 
 
-function enable_diggable_containers()
-   -- global: containers should always be breakable.
+local function enable_diggable_containers()
+   -- global: containers should always be breakable, and should always drop
+   --         their contents.
    --
    -- We prioritise this at all costs, even if it's hamfisted; we NEVER want
    -- players placing indestructible nodes. EVER.
@@ -31,16 +32,35 @@ function enable_diggable_containers()
    }
 
    for _,name in ipairs(sinners) do
-      local def = core.registered_nodes[name]
-      if def then
+      local olddef = core.registered_nodes[name]
+
+      if olddef then
+         local def = table.copy(olddef)
+
          def.can_dig = function(pos)
             return true
          end
+
+         def.on_dig = minetest.node_dig
+
+         def.after_dig_node = function(pos, old, meta, digger)
+            local drops = {}
+            for inv_name, inv_contents in pairs(meta.inventory) do
+               for _, stack in ipairs(inv_contents) do
+                  local item = stack:to_string()
+                  if item ~= "" then
+                     table.insert(drops, item)
+                  end
+               end
+               minetest.handle_node_drops(pos, drops, digger)
+            end
+         end
+         minetest.register_node(":" .. name, def)
       end
    end
 end
 
-function enable_global_oddly_breakable_by_hand()
+local function enable_global_oddly_breakable_by_hand()
    for name,def in pairs(core.registered_nodes) do
       if name ~= "bedrock:bedrock"
          and name ~= "air:air"
