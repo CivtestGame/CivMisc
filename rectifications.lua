@@ -1,7 +1,24 @@
 
 -- Generalist file for rectifying the sins of mods.
 
-function disable_xdecor_hammer()
+local function enable_citadella_for_containers()
+   -- global: containers should be Citadella aware.
+
+   local containers = {
+      "xdecor:mailbox", "default:bookshelf", "xdecor:multishelf", "xdecor:cabinet_half",
+      "xdecor:empty_shelf", "xdecor:cabinet", "bones:bones"
+   }
+
+   for _,name in ipairs(containers) do
+      local olddef = core.registered_nodes[name]
+      if olddef then
+         local def = ct.override_definition(olddef)
+         minetest.register_node(":"..name, def)
+      end
+   end
+end
+
+local function disable_xdecor_hammer()
    -- xdecor: disable the hammer recipe so that players can't repair their tools in
    --         an xdecor:workbench.
    if minetest.get_modpath("xdecor") then
@@ -10,7 +27,7 @@ function disable_xdecor_hammer()
 end
 
 
-function disable_xdecor_enderchest()
+local function disable_xdecor_enderchest()
    -- xdecor: disable the enderchest. No config variable, nice.
    if minetest.get_modpath("xdecor") then
       minetest.unregister_item("xdecor:enderchest")
@@ -84,6 +101,7 @@ minetest.register_on_mods_loaded(function()
       disable_xdecor_enderchest()
       enable_diggable_containers()
       enable_global_oddly_breakable_by_hand()
+      enable_citadella_for_containers()
 
       minetest.debug("[CivMisc] Rectifications initialised.")
 end)
