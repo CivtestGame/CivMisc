@@ -77,21 +77,22 @@ local function enable_diggable_containers()
    end
 end
 
-local function enable_global_oddly_breakable_by_hand()
-   for name,def in pairs(core.registered_nodes) do
-      if name ~= "bedrock:bedrock"
-         and name ~= "air:air"
-         and not name:find("water")
-      then
-         if def.groups
-            and not def.groups.oddly_breakable_by_hand
-         then
-            def.groups.oddly_breakable_by_hand = 1
-            minetest.register_node(":" .. name, def)
-         end
-      end
-   end
-end
+-- local function enable_global_oddly_breakable_by_hand()
+--    for name,def in pairs(core.registered_nodes) do
+--       if name ~= "bedrock:bedrock"
+--          and name ~= "air:air"
+--          and not name:find("water")
+--       then
+--          if def.groups
+--             and not def.groups.oddly_breakable_by_hand
+--          then
+--             local newdef = table.copy(def)
+--             newdef.groups.oddly_breakable_by_hand = 1
+--             minetest.register_node(":" .. name, newdef)
+--          end
+--       end
+--    end
+-- end
 
 -- We use `register_on_mods_loaded` to avoid hard mod dependencies.
 
@@ -100,7 +101,7 @@ minetest.register_on_mods_loaded(function()
       disable_xdecor_hammer()
       disable_xdecor_enderchest()
       enable_diggable_containers()
-      enable_global_oddly_breakable_by_hand()
+      -- enable_global_oddly_breakable_by_hand()
       enable_citadella_for_containers()
 
       minetest.debug("[CivMisc] Rectifications initialised.")
