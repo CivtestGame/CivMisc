@@ -103,33 +103,62 @@ local function enable_diggable_containers()
    end
 end
 
--- local function enable_global_oddly_breakable_by_hand()
---    for name,def in pairs(core.registered_nodes) do
---       if name ~= "bedrock:bedrock"
---          and name ~= "air:air"
---          and not name:find("water")
---       then
---          if def.groups
---             and not def.groups.oddly_breakable_by_hand
---          then
---             local newdef = table.copy(def)
---             newdef.groups.oddly_breakable_by_hand = 1
---             minetest.register_node(":" .. name, newdef)
---          end
---       end
---    end
--- end
+local function fix_xdecor_breakable_chairs()
+   -- xdecor: Fix chair invincibility, and fix the consequences of vincibility.
+   -- Specifically, reset player physics overrides, animations, and eye locations.
+   if not minetest.get_modpath("xdecor") then
+      return
+   end
 
--- We use `register_on_mods_loaded` to avoid hard mod dependencies.
+   local new_sit_dig = function(pos, digger)
+      for _, player in pairs(minetest.get_objects_inside_radius(pos, 0.1)) do
+         if player:is_player()
+            and default.player_attached[player:get_player_name()]
+         then
+            default.player_attached[player:get_player_name()] = false
+            default.player_set_animation(player, "stand", 30)
+            player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
+            player:set_physics_override({speed = 1, jump = 1, gravity = 1})
+         end
+      end
+      return true
+   end
+
+   core.registered_nodes["xdecor:chair"].can_dig = new_sit_dig
+   core.registered_nodes["xdecor:cushion"].can_dig = new_sit_dig
+end
+
+-- ties into xdecor things above but applicable globally. Players, if damaged,
+-- should have physics/attachment/anim/camera state reverted to vanilla.
+--
+-- We also want to close any formspecs they have open. The docs suggest that
+-- this is dangerous though. We'll see.
+--
+minetest.register_on_player_hpchange(function(player, hp_change, reason)
+      if default.player_attached[player:get_player_name()] then
+         player:set_physics_override({speed = 1, jump = 1, gravity = 1})
+         default.player_attached[player:get_player_name()] = false
+         default.player_set_animation(player, "stand", 30)
+         player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
+         minetest.close_formspec(player:get_player_name(), "")
+      end
+end, false)
+
+minetest.register_on_respawnplayer(function(player)
+      default.player_attached[player:get_player_name()] = false
+      player:set_physics_override({speed = 1, jump = 1, gravity = 1})
+      default.player_set_animation(player, "stand", 30)
+      player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
+end)
 
 minetest.register_on_mods_loaded(function()
 
       disable_xdecor_hammer()
       disable_xdecor_enderchest()
       enable_diggable_containers()
-      -- enable_global_oddly_breakable_by_hand()
       enable_citadella_for_containers()
       enable_prisonpearl_tracking_for_containers()
+      fix_xdecor_breakable_chairs()
 
       minetest.debug("[CivMisc] Rectifications initialised.")
 end)
