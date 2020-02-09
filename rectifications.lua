@@ -18,6 +18,25 @@ local function enable_citadella_for_containers()
    end
 end
 
+local function enable_prisonpearl_tracking_for_containers()
+  -- global: containers should be PrisonPearl aware.
+   local containers = {
+      "xdecor:hive", "xdecor:enchantment_table", "xdecor:mailbox", "xdecor:workbench",
+      "xdecor:itemframe", "default:bookshelf", "factory_mod:burner", "factory_mod:smelter",
+      "factory_mod:advanced_smelter", "xdecor:multishelf", "xdecor:cabinet_half",
+      "xdecor:empty_shelf", "xdecor:cabinet", "xdecor:workbench", "bones:bones",
+      "citadella:furnace"
+   }
+
+   for _,name in ipairs(containers) do
+      local olddef = core.registered_nodes[name]
+      if olddef then
+         local def = pp.override_definition(olddef)
+         minetest.register_node(":"..name, def)
+      end
+   end
+end
+
 local function disable_xdecor_hammer()
    -- xdecor: disable the hammer recipe so that players can't repair their tools in
    --         an xdecor:workbench.
@@ -45,7 +64,7 @@ local function enable_diggable_containers()
       "xdecor:hive", "xdecor:enchantment_table", "xdecor:mailbox", "xdecor:workbench",
       "xdecor:itemframe", "default:bookshelf", "factory_mod:burner", "factory_mod:smelter",
       "factory_mod:advanced_smelter", "xdecor:multishelf", "xdecor:cabinet_half",
-      "xdecor:empty_shelf", "xdecor:cabinet", "xdecor:workbench", "bones:bones"
+      "xdecor:empty_shelf", "xdecor:cabinet", "xdecor:workbench", "bones:bones", "vessels:shelf"
    }
 
    for _,name in ipairs(sinners) do
@@ -103,6 +122,7 @@ minetest.register_on_mods_loaded(function()
       enable_diggable_containers()
       -- enable_global_oddly_breakable_by_hand()
       enable_citadella_for_containers()
+      enable_prisonpearl_tracking_for_containers()
 
       minetest.debug("[CivMisc] Rectifications initialised.")
 end)
