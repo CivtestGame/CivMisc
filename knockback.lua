@@ -2,7 +2,11 @@
 local modpath = minetest.get_modpath(minetest.get_current_modname())
 
 function core.calculate_knockback(player, hitter, time_from_last_punch, tool_capabilities, dir, distance, damage)
-   if damage == 0 or player:get_armor_groups().immortal then
+   if damage == 0
+      or player:get_armor_groups().immortal
+      or not (player:get_hp() > 0)
+      or default.player_attached[player:get_player_name()]
+   then
       return 0.0
    end
    -- a good approximation of Minecraft kb:
