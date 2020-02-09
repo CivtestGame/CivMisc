@@ -63,8 +63,9 @@ local function enable_diggable_containers()
    local sinners = {
       "xdecor:hive", "xdecor:enchantment_table", "xdecor:mailbox", "xdecor:workbench",
       "xdecor:itemframe", "default:bookshelf", "factory_mod:burner", "factory_mod:smelter",
-      "factory_mod:advanced_smelter", "xdecor:multishelf", "xdecor:cabinet_half",
-      "xdecor:empty_shelf", "xdecor:cabinet", "xdecor:workbench", "bones:bones", "vessels:shelf"
+      "factory_mod:advanced_smelter", "factory_mod:exceptional_smelter", "xdecor:multishelf",
+      "xdecor:cabinet_half", "xdecor:empty_shelf", "xdecor:cabinet", "xdecor:workbench",
+      "bones:bones", "vessels:shelf"
    }
 
    for _,name in ipairs(sinners) do
@@ -82,6 +83,11 @@ local function enable_diggable_containers()
          def.after_dig_node = function(pos, old, meta, digger)
             local drops = {}
             for inv_name, inv_contents in pairs(meta.inventory) do
+               if inv_name == "forms" and def.name == "xdecor:workbench" then
+                  -- "forms" is used by xdecor:workbench as an output preview,
+                  -- so we don't want to drop them
+                  goto continue
+               end
                for _, stack in ipairs(inv_contents) do
                   local item = stack:to_string()
                   if item ~= "" then
@@ -90,6 +96,7 @@ local function enable_diggable_containers()
                end
                minetest.handle_node_drops(pos, drops, digger)
             end
+            ::continue::
          end
          minetest.register_node(":" .. name, def)
       end
