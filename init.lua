@@ -23,4 +23,6 @@ local damagemod = dofile(modpath .. "damagemod.lua")
 
 local rectifications = dofile(modpath .. "rectifications.lua")
 
+local biome_utils = dofile(modpath .. "biome_utils.lua")
+
 minetest.debug("CivMisc initialised.")

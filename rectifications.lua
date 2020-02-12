@@ -25,7 +25,7 @@ local function enable_prisonpearl_tracking_for_containers()
       "xdecor:itemframe", "default:bookshelf", "factory_mod:burner", "factory_mod:smelter",
       "factory_mod:advanced_smelter", "xdecor:multishelf", "xdecor:cabinet_half",
       "xdecor:empty_shelf", "xdecor:cabinet", "xdecor:workbench", "bones:bones",
-      "citadella:furnace"
+      "citadella:furnace", "citadella:chest"
    }
 
    for _,name in ipairs(containers) do
