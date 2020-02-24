@@ -53,6 +53,13 @@ local function disable_xdecor_enderchest()
    end
 end
 
+local function disable_xdecor_cauldron()
+   -- xdecor: disable the cauldron. Again, no config variable, nice.
+   --         At least we might want this one in the future.
+   if minetest.get_modpath("xdecor") then
+      minetest.unregister_item("xdecor:cauldron_empty")
+   end
+end
 
 local function enable_diggable_containers()
    -- global: containers should always be breakable, and should always drop
@@ -155,6 +162,7 @@ minetest.register_on_mods_loaded(function()
 
       disable_xdecor_hammer()
       disable_xdecor_enderchest()
+      disable_xdecor_cauldron()
       enable_diggable_containers()
       enable_citadella_for_containers()
       enable_prisonpearl_tracking_for_containers()
