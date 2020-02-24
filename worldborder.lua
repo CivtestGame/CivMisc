@@ -43,7 +43,7 @@ minetest.register_globalstep(function(dtime)
                local new_pos = get_closest_position_in_world_border(ppos)
                player:set_pos(new_pos)
             end
-            if not position_in_y_limits(ppos) then
+            if ppos.y < Y_LIMIT_MIN then
                minetest.chat_send_player(pname, "You exceeded the y-level limits.")
                local new_pos = get_closest_position_in_y_limits(ppos)
                player:set_pos(new_pos)
