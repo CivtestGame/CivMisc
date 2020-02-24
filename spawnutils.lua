@@ -98,27 +98,43 @@ local function random_spawn(player)
       pname)
 end
 
--- Respawn player at bed if it still exists. If not, randomspawn them.
-minetest.register_on_respawnplayer(function(player)
-      local pname = player:get_player_name()
-      local pos = beds.spawn[pname]
-      if pos then
-         local node = get_far_node(pos)
-         local node_name = node.name
-         if (node_name == "beds:bed_bottom"
-                     or node_name == "beds:bed_top"
-                     or node_name == "beds:fancy_bed_bottom"
-                     or node_name == "beds:fancy_bed_top")
-         then
-            player:set_pos(pos)
-         else
-            random_spawn(player)
-         end
-      else
-         random_spawn(player)
-      end
-end)
 
+
+-- This code depends on hbhunger
+minetest.register_on_mods_loaded(function()
+      local player_can_respawn_on_bed = function(player)
+         return true
+      end
+      if not minetest.get_modpath("hbhunger") then
+         minetest.log("hbhunger not found! Players will always respawn at their bed!", "warn")
+      else
+         player_can_respawn_on_bed = function(player)
+            local pname = player:get_player_name()
+            return not hbhunger.did_starve[pname]
+         end
+      end
+
+      -- Respawn player at bed if it still exists. If not, randomspawn them.
+      minetest.register_on_respawnplayer(function(player)
+            local pname = player:get_player_name()
+            local pos = beds.spawn[pname]
+            if pos and player_can_respawn_on_bed(player) then
+               local node = get_far_node(pos)
+               local node_name = node.name
+               if (node_name == "beds:bed_bottom"
+                      or node_name == "beds:bed_top"
+                      or node_name == "beds:fancy_bed_bottom"
+                      or node_name == "beds:fancy_bed_top")
+               then
+                  player:set_pos(pos)
+               else
+                  random_spawn(player)
+               end
+            else
+               random_spawn(player)
+            end
+      end)
+end)
 
 minetest.register_on_newplayer(function(player)
       random_spawn(player)
