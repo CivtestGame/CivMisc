@@ -6,7 +6,7 @@ local function enable_citadella_for_containers()
 
    local containers = {
       "xdecor:mailbox", "default:bookshelf", "xdecor:multishelf", "xdecor:cabinet_half",
-      "xdecor:empty_shelf", "xdecor:cabinet", "bones:bones"
+      "xdecor:empty_shelf", "xdecor:cabinet", "bones:bones", "citadella:chest"
    }
 
    for _,name in ipairs(containers) do
@@ -72,7 +72,7 @@ local function enable_diggable_containers()
       "xdecor:itemframe", "default:bookshelf", "factory_mod:burner", "factory_mod:smelter",
       "factory_mod:advanced_smelter", "factory_mod:exceptional_smelter", "xdecor:multishelf",
       "xdecor:cabinet_half", "xdecor:empty_shelf", "xdecor:cabinet", "xdecor:workbench",
-      "bones:bones", "vessels:shelf"
+      "bones:bones", "vessels:shelf", "citadella:chest"
    }
 
    for _,name in ipairs(sinners) do
