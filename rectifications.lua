@@ -101,8 +101,8 @@ local function enable_diggable_containers()
                      table.insert(drops, item)
                   end
                end
-               minetest.handle_node_drops(pos, drops, digger)
             end
+            minetest.handle_node_drops(pos, drops, digger)
             ::continue::
          end
          minetest.register_node(":" .. name, def)
