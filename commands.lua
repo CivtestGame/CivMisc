@@ -33,7 +33,9 @@ local function register_alias(alias, command, ...)
 
       minetest.chatcommands[alias].func = function(sender, ...)
          local tab = {...}
-         return old_func(sender, unpack(args), unpack(tab, argc))
+         return old_func(
+            sender, table.concat({ unpack(args), unpack(tab, argc) }, " ")
+         )
       end
    end
 
@@ -58,6 +60,11 @@ minetest.register_on_mods_loaded(function()
       register_alias("tp", "teleport")
       register_alias("day", "time", "5:30")
       register_alias("night", "time", "18:00")
+
+      register_alias("gc", "group", "create")
+      register_alias("ga", "group", "add")
+      register_alias("gr", "group", "remove")
+      register_alias("gi", "group", "info")
 
       -- we have a more flexible /kill above
       minetest.unregister_chatcommand("killme")
