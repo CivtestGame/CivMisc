@@ -1,5 +1,20 @@
 
-local WORLD_BORDER_RADIUS = 1000
+local world_border_radius = tonumber(minetest.settings:get("civmisc_world_border_radius"))
+
+if not world_border_radius then
+   world_border_radius = 1000
+   minetest.log(
+      "warning",
+      "[CivMisc] No world border radius specified, defaulting to "
+         .. tonumber(world_border_radius) .. "."
+   )
+else
+   minetest.log(
+      "[CivMisc] World border radius set to "
+         .. tonumber(world_border_radius) .. "."
+   )
+end
+
 local Y_LIMIT_MAX = 250
 local Y_LIMIT_MIN = -250
 
@@ -7,13 +22,13 @@ local zerozero = vector.new(0, 0, 0)
 
 local function position_in_world_border(pos)
    local pos_no_y = vector.new(pos.x, 0, pos.z)
-   return vector.distance(pos_no_y, zerozero) < WORLD_BORDER_RADIUS
+   return vector.distance(pos_no_y, zerozero) < world_border_radius
 end
 
 local function get_closest_position_in_world_border(pos)
    local pos_no_y = vector.new(pos.x, 0, pos.z)
    local normalized = vector.normalize(pos_no_y)
-   local new_pos = vector.multiply(normalized, WORLD_BORDER_RADIUS)
+   local new_pos = vector.multiply(normalized, world_border_radius)
    -- Preserve the player's y position
    new_pos.y = pos.y
    return new_pos
@@ -98,4 +113,5 @@ if boats_loaded then
    end
 
 end
+
 minetest.debug("[CivMisc] WorldBorder initialised.")
