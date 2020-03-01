@@ -21,32 +21,28 @@ minetest.register_chatcommand(
    }
 )
 
-local function register_alias(alias, command, ...)
+local function register_alias(alias, command)
+   local c_split = string.split(command, " ", nil, 1)
+   local cname = c_split[1]
+   local cargs = c_split[2] or ""
 
-   minetest.chatcommands[alias] = table.copy(minetest.chatcommands[command])
+   minetest.chatcommands[alias] = table.copy(minetest.chatcommands[cname])
 
-   local argc = select('#', ...)
-   local args = {...}
+   local old_func = minetest.chatcommands[alias].func
 
-   if argc > 0 then
-      local old_func = minetest.chatcommands[alias].func
-
-      minetest.chatcommands[alias].func = function(sender, ...)
-         local tab = {...}
-         return old_func(
-            sender, table.concat({ unpack(args), unpack(tab, argc) }, " ")
-         )
+   minetest.chatcommands[alias].func = function(sender, param)
+      if cargs == "" then
+         return old_func(sender, param)
+      elseif param == "" then
+         return old_func(sender, cargs)
+      else
+         return old_func(sender, cargs .. " " .. param)
       end
    end
 
-   local full_command = command .. " " .. table.concat(args, " ")
-
-   minetest.chatcommands[alias].description = "Alias of '/"
-      .. full_command .. "'."
+   minetest.chatcommands[alias].description = "Alias of '/" .. command .. "'."
    minetest.chatcommands[alias].params = ""
-
-   minetest.log("[CivMisc] Command alias: /" .. alias .. " --> /"
-                   .. full_command .. "")
+   minetest.log("[CivMisc] Command alias: /" .. alias .. " --> /" .. command)
 end
 
 minetest.register_on_mods_loaded(function()
@@ -58,13 +54,13 @@ minetest.register_on_mods_loaded(function()
       minetest.chatcommands["time"].privs = { settime = true }
 
       register_alias("tp", "teleport")
-      register_alias("day", "time", "5:30")
-      register_alias("night", "time", "18:00")
+      register_alias("day", "time 5:30")
+      register_alias("night", "time 18:00")
 
-      register_alias("gc", "group", "create")
-      register_alias("ga", "group", "add")
-      register_alias("gr", "group", "remove")
-      register_alias("gi", "group", "info")
+      register_alias("gc", "group create")
+      register_alias("ga", "group add")
+      register_alias("gr", "group remove")
+      register_alias("gi", "group info")
 
       -- we have a more flexible /kill above
       minetest.unregister_chatcommand("killme")
