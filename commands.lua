@@ -61,6 +61,9 @@ minetest.register_on_mods_loaded(function()
       register_alias("ga", "group add")
       register_alias("gr", "group remove")
       register_alias("gi", "group info")
+      register_alias("gl", "group list")
+
+      register_alias("ppl", "pplocate")
 
       -- we have a more flexible /kill above
       minetest.unregister_chatcommand("killme")
