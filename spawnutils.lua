@@ -1,4 +1,19 @@
 
+local random_spawn_radius = tonumber(minetest.settings:get("civmisc_random_spawn_radius"))
+if not random_spawn_radius then
+   random_spawn_radius = 500
+   minetest.log(
+      "warning",
+      "[CivMisc] No random spawn radius specified, defaulting to "
+         .. tonumber(random_spawn_radius) .. "."
+   )
+else
+   minetest.log(
+      "[CivMisc] Random spawn radius set to "
+         .. tonumber(random_spawn_radius) .. "."
+   )
+end
+
 -- From https://dev.minetest.net/minetest.get_node
 -- should only be ignore if there's not generated map
 local function get_far_node(pos)
@@ -45,9 +60,6 @@ local function get_random_xz_in_circle(radius)
 
    return x, z
 end
-
--- TODO: config this
-local random_spawn_radius = 750
 
 local function try_random_spawn(player, x, z)
    -- Ensure we have coordinates to try to spawn the player at. Generate random
