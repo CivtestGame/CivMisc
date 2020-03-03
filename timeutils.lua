@@ -3,6 +3,10 @@
 local last_timeofday = nil
 local change_per_second = nil
 
+local function clamp(n, min, max)
+   return math.max(math.min(n, max), min)
+end
+
 local timer = 0
 minetest.register_globalstep(function(dtime)
       timer = timer + dtime
@@ -34,7 +38,9 @@ minetest.register_globalstep(function(dtime)
 
       -- Speed up "night" (between 6pm and 6am) by 2x.
       if timeofday > 0.75 or timeofday < 0.25 then
-         core.set_timeofday(timeofday + change_per_second)
+         core.set_timeofday(
+            clamp(timeofday + change_per_second, 0.0, 1.0)
+         )
       end
 end)
 
