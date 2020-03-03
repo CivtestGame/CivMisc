@@ -46,16 +46,13 @@ local function register_alias(alias, command)
 end
 
 minetest.register_on_mods_loaded(function()
-      -- clearinv being unprivileged is INSANE! wtf minetest
+      -- clearinv being unprivileged is weird
       minetest.chatcommands["clearinv"].privs = { server = true }
       minetest.chatcommands["pulverize"].privs = { server = true }
-      -- for some reason /time (and aliases) were appearing green in /help for
-      -- those without the privilege...
-      minetest.chatcommands["time"].privs = { settime = true }
 
       register_alias("tp", "teleport")
-      register_alias("day", "time 5:30")
-      register_alias("night", "time 18:00")
+      register_alias("day", "settime 5:30")
+      register_alias("night", "settime 18:00")
 
       register_alias("gc", "group create")
       register_alias("ga", "group add")

@@ -25,6 +25,8 @@ local rectifications = dofile(modpath .. "rectifications.lua")
 
 local biome_utils = dofile(modpath .. "biome_utils.lua")
 
+local timeutils = dofile(modpath .. "timeutils.lua")
+
 local commands = dofile(modpath .. "commands.lua")
 
 minetest.debug("CivMisc initialised.")
