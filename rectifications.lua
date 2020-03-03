@@ -170,3 +170,32 @@ minetest.register_on_mods_loaded(function()
 
       minetest.debug("[CivMisc] Rectifications initialised.")
 end)
+
+
+-- Transform all chests into Citadella ones.
+if minetest.get_modpath("citadella") then
+   minetest.register_abm({
+         label = "default:chest fixer",
+         name = "civmisc:chest_fixer",
+         nodenames = { "default:chest", "default:chest_locked" },
+         interval = 1,
+         chance = 1,
+         action = function(pos, node)
+            local old_meta = minetest.get_meta(pos)
+            local old_inv = old_meta:get_inventory()
+
+            local old_invlist_main = table.copy(old_inv:get_list("main"))
+
+            minetest.remove_node(pos)
+            minetest.set_node(
+               pos, { name = "citadella:chest", param1 = 0, param2 = 0}
+            )
+            local new_meta = minetest.get_meta(pos)
+            local new_inv = new_meta:get_inventory()
+            new_inv:set_list("main", old_invlist_main)
+         end
+   })
+   minetest.log(
+      "[CivMisc] default:chest --> citadella:chest transformer ABM is active!"
+   )
+end
