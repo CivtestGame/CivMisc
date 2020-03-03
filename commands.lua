@@ -70,3 +70,30 @@ minetest.register_on_mods_loaded(function()
 
       minetest.debug("[CivMisc] Commands initialised.")
 end)
+
+local C = minetest.colorize
+
+minetest.register_chatcommand(
+   "players",
+   {
+      params = "",
+      description = "Lists online players.",
+      privs = { server = true },
+      func = function(sender)
+         local player = minetest.get_player_by_name(sender)
+         if not player then
+            return false
+         end
+
+         local tab = {}
+         for _,p in ipairs(minetest.get_connected_players()) do
+            tab[#tab + 1] = p:get_player_name()
+         end
+         table.sort(tab)
+         minetest.chat_send_player(
+            sender, C("#0f0", "Players:\n") .. table.concat(tab, "  ")
+         )
+         return true
+      end
+   }
+)
