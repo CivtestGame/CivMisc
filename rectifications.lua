@@ -174,12 +174,11 @@ end)
 
 -- Transform all chests into Citadella ones.
 if minetest.get_modpath("citadella") then
-   minetest.register_abm({
+   minetest.register_lbm({
          label = "default:chest fixer",
          name = "civmisc:chest_fixer",
          nodenames = { "default:chest", "default:chest_locked" },
-         interval = 1,
-         chance = 1,
+         run_at_every_load = true,
          action = function(pos, node)
             local old_meta = minetest.get_meta(pos)
             local old_inv = old_meta:get_inventory()
@@ -196,6 +195,6 @@ if minetest.get_modpath("citadella") then
          end
    })
    minetest.log(
-      "[CivMisc] default:chest --> citadella:chest transformer ABM is active!"
+      "[CivMisc] default:chest --> citadella:chest transformer LBM is active!"
    )
 end
