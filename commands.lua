@@ -67,9 +67,6 @@ minetest.register_on_mods_loaded(function()
       -- we have a more flexible /kill above
       minetest.unregister_chatcommand("killme")
 
-      -- chatplus should handle this
-      minetest.unregister_chatcommand("me")
-
       minetest.debug("[CivMisc] Commands initialised.")
 end)
 
