@@ -77,7 +77,6 @@ minetest.register_chatcommand(
    {
       params = "",
       description = "Lists online players.",
-      privs = { server = true },
       func = function(sender)
          local player = minetest.get_player_by_name(sender)
          if not player then
