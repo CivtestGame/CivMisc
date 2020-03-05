@@ -17,8 +17,6 @@ local spawnutils = dofile(modpath .. "spawnutils.lua")
 
 local worldborder = dofile(modpath .. "worldborder.lua")
 
-local chat = dofile(modpath .. "chat.lua")
-
 local damagemod = dofile(modpath .. "damagemod.lua")
 
 local rectifications = dofile(modpath .. "rectifications.lua")
