@@ -135,6 +135,33 @@ local function fix_xdecor_breakable_chairs()
    core.registered_nodes["xdecor:cushion"].can_dig = new_sit_dig
 end
 
+
+local function enable_ore_infotexts()
+   -- global: ores should announce what they are.
+   local ores = {
+      "default:stone_with_coal", "default:stone_with_copper",
+      "default:stone_with_tin", "default:stone_with_iron",
+      "default:stone_with_gold", "default:stone_with_diamond",
+      "default:stone_with_mese"
+   }
+
+   for _,name in ipairs(ores) do
+      local olddef = core.registered_nodes[name]
+
+      if olddef then
+         local def = table.copy(olddef)
+
+         def.on_punch = function(pos)
+            local meta = minetest.get_meta(pos)
+            meta:set_string("infotext", def.description)
+         end
+
+         minetest.register_node(":" .. name, def)
+      end
+   end
+end
+
+
 -- ties into xdecor things above but applicable globally. Players, if damaged,
 -- should have physics/attachment/anim/camera state reverted to vanilla.
 --
@@ -167,6 +194,7 @@ minetest.register_on_mods_loaded(function()
       enable_citadella_for_containers()
       enable_prisonpearl_tracking_for_containers()
       fix_xdecor_breakable_chairs()
+      enable_ore_infotexts()
 
       minetest.debug("[CivMisc] Rectifications initialised.")
 end)
