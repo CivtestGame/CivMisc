@@ -151,9 +151,13 @@ local function enable_ore_infotexts()
       if olddef then
          local def = table.copy(olddef)
 
-         def.on_punch = function(pos)
-            local meta = minetest.get_meta(pos)
-            meta:set_string("infotext", def.description)
+         def.on_rightclick = function(pos, node, clicker)
+            if clicker:is_player() then
+               local pname = clicker:get_player_name()
+               minetest.chat_send_player(
+                  pname, "This is a block of " .. def.description .. "."
+               )
+            end
          end
 
          minetest.register_node(":" .. name, def)
