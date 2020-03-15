@@ -165,6 +165,27 @@ local function enable_ore_infotexts()
    end
 end
 
+local function enable_floodable_flora()
+   for name,def in pairs(core.registered_nodes) do
+      local groups = def.groups
+      if groups.flora
+         or groups.food_mushroom
+      then
+         local newdef = table.copy(def)
+         newdef.floodable = true
+         newdef.on_flood = function(pos, oldnode, newnode)
+            if not minetest.is_protected(pos) then
+               minetest.dig_node(pos)
+               return false
+            else
+               return true
+            end
+         end
+
+         minetest.register_node(":" .. name, newdef)
+      end
+   end
+end
 
 -- ties into xdecor things above but applicable globally. Players, if damaged,
 -- should have physics/attachment/anim/camera state reverted to vanilla.
@@ -199,6 +220,7 @@ minetest.register_on_mods_loaded(function()
       enable_prisonpearl_tracking_for_containers()
       fix_xdecor_breakable_chairs()
       enable_ore_infotexts()
+      enable_floodable_flora()
 
       minetest.debug("[CivMisc] Rectifications initialised.")
 end)
