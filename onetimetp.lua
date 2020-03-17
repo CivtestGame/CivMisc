@@ -9,7 +9,8 @@ minetest.register_on_newplayer(function(player)
       minetest.after(3,
          function()
             minetest.chat_send_player(
-               pname, "Your one-time teleport is available!"
+               pname, "Your one-time teleport is available!\n"
+                  .. "   See `/teleport_request` for more information."
             )
          end
       )
@@ -45,12 +46,24 @@ minetest.register_chatcommand(
                ((sender_meta:get_int("onetimetp") + ONE_TIME_TP_PERIOD) - now)
                   / 60
             ))
-            sender_meta:set_int("onetimetp_available", 1)
-            return false, "Before using /teleport_request, please note:\n "
-               .. " 1. You can only teleport once using this command.\n "
-               .. " 2. This teleport ability expires in "..mins.." minutes.\n "
-               .. " 3. Teleporting will delete all items from your inventory.\n "
-               .. "Use /teleport_request again to confirm your teleport."
+            minetest.chat_send_player(
+               sender_name,
+               "\nBefore using /teleport_request, please note:\n "
+                  .. " 1. You can only teleport once using this command.\n "
+                  .. " 2. Your ability to teleport expires in "..mins.." minutes.\n "
+                  .. " 3. Your inventory will be dropped before you teleport.\n"
+            )
+            if params ~= "" then
+               minetest.chat_send_player(
+                  sender_name,
+                  "Use `/teleport_request " .. params
+                     .. "` again to confirm your teleport."
+               )
+               sender_meta:set_int("onetimetp_available", 1)
+            end
+            minetest.chat_send_player(sender_name, " \n")
+            -- The player must see the above message before trying to teleport.
+            return false
          end
 
          if params == "" then
@@ -59,22 +72,20 @@ minetest.register_chatcommand(
 
          local target_name = params
 
-         if minetest.get_player_by_name(target_name) then
-            minetest.chat_send_player(
-               target_name, "Player '"..sender_name.."' has requested a "
-                  .. "teleport to you. Use '/teleport_accept " .. sender_name
-                  .. "' to accept the request."
-            )
-            teleport_requests[target_name] = teleport_requests[target_name] or {}
-            teleport_requests[target_name][sender_name] = true
-         else
-            minetest.chat_send_player(
-               sender_name, "Player '"..target_name.." is not online."
-            )
+         if not minetest.get_player_by_name(target_name) then
+            return false, target_name .. " is not online."
          end
 
-         return true, "One-time teleport request sent to '" .. target_name
-            .. "'. Please wait for them to accept it."
+         minetest.chat_send_player(
+            target_name, sender_name .. " has requested a "
+               .. "teleport to you. Use '/teleport_accept " .. sender_name
+               .. "' to accept the request."
+         )
+         teleport_requests[target_name] = teleport_requests[target_name] or {}
+         teleport_requests[target_name][sender_name] = true
+
+         return true, "One-time teleport request sent to " .. target_name
+            .. ". Please wait for them to accept it."
       end
    }
 )
@@ -84,7 +95,7 @@ local function teleport_player(src_name, dst_name)
       or not teleport_requests[dst_name][src_name]
    then
       minetest.chat_send_player(
-         dst_name, "Player '"..src_name.." did not request to teleport to you."
+         dst_name, src_name .. " did not request to teleport to you."
       )
       return false
    end
@@ -92,7 +103,7 @@ local function teleport_player(src_name, dst_name)
    local src = minetest.get_player_by_name(src_name)
    if not src then
       minetest.chat_send_player(
-         dst_name, "Player '"..src_name.."' is not online."
+         dst_name, src_name .. " is not online."
       )
       return false
    end
@@ -105,16 +116,56 @@ local function teleport_player(src_name, dst_name)
       or src_meta:get_int("onetimetp_available") == 0
    then
       minetest.chat_send_player(
-         dst_name, "Player '"..src_name.."' can no longer teleport to you."
+         dst_name, src_name .. " can no longer teleport to you."
       )
       return false
    end
 
-   src_meta:set_int("onetimetp_available", 0)
+   -- The dst is the sender of this command, so this obj will always be valid.
+   local dst = minetest.get_player_by_name(dst_name)
 
-   -- teleport
-   minetest.chat_send_all("el teleport")
+   -- XXX: this is a bit of a hack.
    --
+   -- We kill the player, then wait a couple of seconds to teleport + revive
+   -- them manually -- bypassing `minetest.register_on_respawnplayer`. We then
+   -- force-close the death formspec (it's useless once the player is revived.)
+   --
+   -- However, perhaps I should be handling this more cleanly using
+   -- `minetest.register_on_respawnplayer` instead. That change is trickier
+   -- because it requires some coherency with spawnutils.lua and overriding
+   -- randomspawning. We should have a way to change the text on the death
+   -- formspec, too.
+
+   src:set_hp(0)
+
+   -- capture the dst_pos prior to executing the delayed revive. Avoids a
+   -- potential crash if the dst player disconnects immediately after accepting.
+   local dst_pos = dst:get_pos()
+   minetest.after(
+      2,
+      function()
+         -- Sanity check that the src player is still online.
+         if not minetest.get_player_by_name(src_name)
+            or src_meta:get_int("onetimetp_available") == 0
+         then
+            minetest.chat_send_player(
+               dst_name, src_name .. " could not be teleported at this time."
+            )
+            return
+         end
+
+         src_meta:set_int("onetimetp_available", 0)
+         minetest.chat_send_player(
+            src_name, "You have been teleported to "..dst_name.."!"
+         )
+         minetest.chat_send_player(
+            dst_name, src_name .. " has been teleported to you!"
+         )
+         src:set_pos(dst_pos)
+         src:set_hp(200)
+         minetest.close_formspec(src_name, "")
+      end
+   )
 
    return true
 end
