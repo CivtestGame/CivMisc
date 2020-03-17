@@ -27,4 +27,6 @@ local timeutils = dofile(modpath .. "timeutils.lua")
 
 local commands = dofile(modpath .. "commands.lua")
 
+local onetimetp = dofile(modpath .. "onetimetp.lua")
+
 minetest.debug("CivMisc initialised.")
