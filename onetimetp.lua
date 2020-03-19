@@ -1,5 +1,5 @@
 
-local ONE_TIME_TP_PERIOD = 60 * 30 -- 30 mins
+local ONE_TIME_TP_PERIOD = 60 * 60 -- 60 mins
 
 minetest.register_on_newplayer(function(player)
       local pname = player:get_player_name()
