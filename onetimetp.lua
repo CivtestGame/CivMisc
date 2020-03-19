@@ -90,6 +90,73 @@ minetest.register_chatcommand(
    }
 )
 
+-- If the item name contains any of these, newfriends shouldn't be able to
+-- transport them.
+local INVALID_ITEMS = {
+   "tin", "copper", "bronze", "iron", "steel", "obsidian", "gold", "tnt",
+   "lava", "mese", "diamond", "mithril", "bucket", "coke", "smelter"
+}
+
+-- Newfriends shouldn't be able to bring large amounts of stuff with them.
+-- Four stacks is a good limit.
+local ITEM_LIMIT = 396
+
+local function is_teleportable_item(item)
+   local name = item:get_name()
+
+   for _,invalid_name in ipairs(INVALID_ITEMS) do
+      if name:find(invalid_name) then
+         return false
+      end
+   end
+
+   return true
+end
+
+local function check_teleported_inventory(player)
+   local errors = {}
+
+   local pname = player:get_player_name()
+   local inv = player:get_inventory()
+   local name, armor_inv = armor:get_valid_player(player, "[on_dieplayer]")
+   if not name then
+      minetest.log("warning", "filter_teleported_inventory invalid armor inv")
+      return false
+   end
+
+   if not armor_inv:is_empty("armor") then
+      errors[#errors + 1] = "Armor cannot be worn while teleporting."
+   end
+
+   local item_total = 0
+
+   local invlists = inv:get_lists()
+   -- hbhunger strikes again with its archaic ways...
+   invlists["hunger"] = nil
+
+   for invname,contents in pairs(invlists) do
+      for i,item in ipairs(contents) do
+         if is_teleportable_item(item) then
+            if not item:is_empty() then
+               item_total = item_total + item:get_count()
+            end
+         else
+            local def = item:get_definition()
+            local name = item:get_name()
+            errors[#errors + 1] = "Item '" .. def.description
+               .. "' (" .. name .. ") is not allowed to be teleported."
+         end
+      end
+   end
+
+   if item_total > ITEM_LIMIT then
+      errors[#errors + 1] = "Inventory is over capacity by "
+         .. tostring(item_total - ITEM_LIMIT) .. " items or blocks."
+   end
+
+   return not next(errors), errors
+end
+
 local function teleport_player(src_name, dst_name)
    if not teleport_requests[dst_name]
       or not teleport_requests[dst_name][src_name]
@@ -124,48 +191,29 @@ local function teleport_player(src_name, dst_name)
    -- The dst is the sender of this command, so this obj will always be valid.
    local dst = minetest.get_player_by_name(dst_name)
 
-   -- XXX: this is a bit of a hack.
-   --
-   -- We kill the player, then wait a couple of seconds to teleport + revive
-   -- them manually -- bypassing `minetest.register_on_respawnplayer`. We then
-   -- force-close the death formspec (it's useless once the player is revived.)
-   --
-   -- However, perhaps I should be handling this more cleanly using
-   -- `minetest.register_on_respawnplayer` instead. That change is trickier
-   -- because it requires some coherency with spawnutils.lua and overriding
-   -- randomspawning. We should have a way to change the text on the death
-   -- formspec, too.
+   local valid_inv, errors = check_teleported_inventory(src)
 
-   src:set_hp(0)
+   if not valid_inv then
+      minetest.chat_send_player(
+         src_name, "Teleport to "..dst_name.." failed, please address the "
+            .. "following issues:\n  - " .. table.concat(errors, "\n  - ")
+      )
+      minetest.chat_send_player(
+         dst_name, src_name.." failed to teleport because of inventory "
+         .. "restrictions. Please wait for them to correct this, and try again."
+      )
+      return false
+   end
 
-   -- capture the dst_pos prior to executing the delayed revive. Avoids a
-   -- potential crash if the dst player disconnects immediately after accepting.
-   local dst_pos = dst:get_pos()
-   minetest.after(
-      2,
-      function()
-         -- Sanity check that the src player is still online.
-         if not minetest.get_player_by_name(src_name)
-            or src_meta:get_int("onetimetp_available") == 0
-         then
-            minetest.chat_send_player(
-               dst_name, src_name .. " could not be teleported at this time."
-            )
-            return
-         end
-
-         src_meta:set_int("onetimetp_available", 0)
-         minetest.chat_send_player(
-            src_name, "You have been teleported to "..dst_name.."!"
-         )
-         minetest.chat_send_player(
-            dst_name, src_name .. " has been teleported to you!"
-         )
-         src:set_pos(dst_pos)
-         src:set_hp(200)
-         minetest.close_formspec(src_name, "")
-      end
+   src_meta:set_int("onetimetp_available", 0)
+   minetest.chat_send_player(
+      src_name, "You have been teleported to "..dst_name.."!"
    )
+   minetest.chat_send_player(
+      dst_name, src_name .. " has been teleported to you!"
+   )
+
+   src:set_pos(dst:get_pos())
 
    return true
 end
