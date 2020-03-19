@@ -125,7 +125,7 @@ local function check_teleported_inventory(player)
    end
 
    if not armor_inv:is_empty("armor") then
-      errors[#errors + 1] = "Armor cannot be worn while teleporting."
+      errors[#errors + 1] = "Take off your armor and put it in your inventory."
    end
 
    local item_total = 0
@@ -143,15 +143,15 @@ local function check_teleported_inventory(player)
          else
             local def = item:get_definition()
             local name = item:get_name()
-            errors[#errors + 1] = "Item '" .. def.description
-               .. "' (" .. name .. ") is not allowed to be teleported."
+            errors[#errors + 1] = "Remove the " .. def.description
+               .. " from your inventory (" .. name .. ")."
          end
       end
    end
 
    if item_total > ITEM_LIMIT then
-      errors[#errors + 1] = "Inventory is over capacity by "
-         .. tostring(item_total - ITEM_LIMIT) .. " items or blocks."
+      errors[#errors + 1] = "Reduce the items and blocks you carry by "
+         .. tostring(item_total - ITEM_LIMIT) .. "."
    end
 
    return not next(errors), errors
@@ -195,8 +195,9 @@ local function teleport_player(src_name, dst_name)
 
    if not valid_inv then
       minetest.chat_send_player(
-         src_name, "Teleport to "..dst_name.." failed, please address the "
-            .. "following issues:\n  - " .. table.concat(errors, "\n  - ")
+         src_name, "Teleport to "..dst_name.." failed. Try again after "
+            .. "following these steps:\n - "
+            .. table.concat(errors, "\n - ")
       )
       minetest.chat_send_player(
          dst_name, src_name.." failed to teleport because of inventory "
