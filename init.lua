@@ -29,4 +29,6 @@ local commands = dofile(modpath .. "commands.lua")
 
 local onetimetp = dofile(modpath .. "onetimetp.lua")
 
+local case_insensitivity = dofile(modpath .. "case_insensitivity.lua")
+
 minetest.debug("CivMisc initialised.")
