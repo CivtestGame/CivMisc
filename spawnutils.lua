@@ -120,10 +120,10 @@ minetest.register_on_mods_loaded(function()
       if not minetest.get_modpath("hbhunger") then
          minetest.log("hbhunger not found! Players will always respawn at their bed!", "warn")
       else
-         player_can_respawn_on_bed = function(player)
-            local pname = player:get_player_name()
-            return not hbhunger.did_starve[pname]
-         end
+         -- player_can_respawn_on_bed = function(player)
+         --    local pname = player:get_player_name()
+         --    return not hbhunger.did_starve[pname]
+         -- end
       end
 
       -- Respawn player at bed if it still exists. If not, randomspawn them.
