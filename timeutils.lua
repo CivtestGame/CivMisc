@@ -36,8 +36,8 @@ minetest.register_globalstep(function(dtime)
          end
       end
 
-      -- Speed up "night" (between 6pm and 6am) by 2x.
-      if timeofday > 0.75 or timeofday < 0.25 then
+      -- Speed up "night" (between 9pm and 3am) by 2x.
+      if timeofday > 0.875 or timeofday < 0.125 then
          core.set_timeofday(
             clamp(timeofday + change_per_second, 0.0, 1.0)
          )
