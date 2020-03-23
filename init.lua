@@ -39,11 +39,11 @@ if fennel then
    fennel.dofile(modpath .. "test.fnl")
 end
 
-jeejah = ie.require("jeejah")
-if jeejah then
-   local coro = jeejah.start(
-      7888, { debug = true }
-   )
+local jeejah = ie.require("jeejah")
+local jeejah_port = tonumber(minetest.settings:get("civmisc_jeejah_port"))
+
+if jeejah and jeejah_port then
+   local coro = jeejah.start(jeejah_port, { debug = true } )
    --
    -- Ouch. Tying the coroutine.resume to the globalstep means that jeejah is
    -- operating on minetest's (slowed-down) gametick schedule, thus leading to
@@ -54,7 +54,7 @@ if jeejah then
    minetest.register_globalstep(function(dtime)
          coroutine.resume(coro)
    end)
-   minetest.log("[CivMisc] Jeejah initialised.")
+   minetest.log("[CivMisc] Jeejah initialised on port "..tostring(jeejah_port))
 end
 
 minetest.debug("CivMisc initialised.")
