@@ -72,7 +72,8 @@ local function enable_diggable_containers()
       "xdecor:itemframe", "default:bookshelf", "factory_mod:burner", "factory_mod:smelter",
       "factory_mod:advanced_smelter", "factory_mod:exceptional_smelter", "xdecor:multishelf",
       "xdecor:cabinet_half", "xdecor:empty_shelf", "xdecor:cabinet", "xdecor:workbench",
-      "bones:bones", "vessels:shelf", "citadella:chest"
+      "bones:bones", "vessels:shelf", "citadella:chest",
+      "fancy_vend:player_vendor"
    }
 
    for _,name in ipairs(sinners) do
@@ -85,7 +86,9 @@ local function enable_diggable_containers()
             return true
          end
 
-         def.on_dig = minetest.node_dig
+         if def.name ~= "fancy_vend:player_vendor" then
+            def.on_dig = minetest.node_dig
+         end
 
          def.after_dig_node = function(pos, old, meta, digger)
             local drops = {}
@@ -95,15 +98,22 @@ local function enable_diggable_containers()
                   -- so we don't want to drop them
                   goto continue
                end
+               if (inv_name == "wanted_item" or inv_name == "given_item")
+                  and def.name == "fancy_vend:player_vendor"
+               then
+                  -- fancy_vend uses some inventories for presentation purposes,
+                  -- but they don't store actual items. So, don't drop 'em.
+                  goto continue
+               end
                for _, stack in ipairs(inv_contents) do
                   local item = stack:to_string()
                   if item ~= "" then
-                     table.insert(drops, item)
+                     drops[#drops + 1] = item
                   end
                end
+               ::continue::
             end
             minetest.handle_node_drops(pos, drops, digger)
-            ::continue::
          end
          minetest.register_node(":" .. name, def)
       end
