@@ -148,7 +148,40 @@ minetest.register_on_mods_loaded(function()
       end)
 end)
 
+local book_text = [[
+Welcome to Civtest!
+
+Civtest is a Minetest server that provides players with a powerful sandbox for building a civilization.
+
+Please read the Getting Started Guide here:
+  https://reddit.com/r/Civtest/wiki/getting-started
+
+If you don't fancy exploring the wilderness alone, you should find someone who will accept a '/teleport_request'.
+
+Come and get involved in our community!
+   Reddit:  https://reddit.com/r/Civtest
+   Discord: https://discord.gg/DHEbhDF
+]]
+
 minetest.register_on_newplayer(function(player)
+
+      local book = ItemStack("default:book_written")
+      local data = book:get_meta():to_table().fields
+
+      data.title = "Civtest Starter Guide (0.1)"
+      data.description = "\"Civtest Starter Guide (0.1)\" by R3"
+      data.text = book_text
+      data.owner = "R3"
+      data.page = 1
+      data.page_max = 1
+
+      book:get_meta():from_table({ fields = data })
+
+      player_api.give_item(player, book)
+      player_api.give_item(player, "default:torch 10")
+      player_api.give_item(player, "default:blueberries 5")
+      player_api.give_item(player, "default:apple 2")
+
       random_spawn(player)
 end)
 
