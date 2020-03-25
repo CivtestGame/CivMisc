@@ -19,15 +19,15 @@ function core.calculate_knockback(player, hitter, time_from_last_punch,
 
    local pos = player:get_pos()
    local pos_y = pos.y
-   local decimals_y = pos_y - round(pos_y)
 
-   if decimals_y > 0 then
-      dir.y = dir.y + 0.25
-      return 2.5
+   if time_from_last_punch > 1 then
+      dir.y = 1
+      return 4.75
    else
-      dir.y = 0.75
-      return 7.5
+      dir.y = 0.9
+      return 4.25
    end
+
 end
 
 minetest.debug("[CivMisc] Knockback initialised.")
