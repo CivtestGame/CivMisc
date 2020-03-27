@@ -84,12 +84,15 @@ minetest.register_chatcommand(
          end
 
          local tab = {}
+         local count = 0
          for _,p in ipairs(minetest.get_connected_players()) do
             tab[#tab + 1] = p:get_player_name()
+            count = count + 1
          end
          table.sort(tab)
          minetest.chat_send_player(
-            sender, C("#0f0", "Players:\n") .. table.concat(tab, "  ")
+            sender, C("#0f0", "Players (") .. C("#fff", tostring(count))
+               .. C("#0f0", "):\n") .. table.concat(tab, " ")
          )
          return true
       end
