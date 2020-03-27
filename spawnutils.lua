@@ -156,7 +156,7 @@ Civtest is a Minetest server that provides players with a powerful sandbox for b
 Please read the Getting Started Guide here:
   https://reddit.com/r/Civtest/wiki/getting-started
 
-If you don't fancy exploring the wilderness alone, you should find someone who will accept a '/teleport_request'.
+If you don't want to explore the wilderness alone, you should find someone who will accept a '/teleport_request'. Your chat messages are limited to a 1000 block radius. Please note that ore distribution is different on this server, see the Getting Started guide for more information.
 
 Come and get involved in our community!
    Reddit:  https://reddit.com/r/Civtest
@@ -168,8 +168,8 @@ minetest.register_on_newplayer(function(player)
       local book = ItemStack("default:book_written")
       local data = book:get_meta():to_table().fields
 
-      data.title = "Civtest Starter Guide (0.1)"
-      data.description = "\"Civtest Starter Guide (0.1)\" by R3"
+      data.title = "Civtest Starter Guide (0.2)"
+      data.description = "\"Civtest Starter Guide (0.2)\" by R3"
       data.text = book_text
       data.owner = "R3"
       data.page = 1
