@@ -11,7 +11,7 @@ minetest.get_player_by_name = function(name)
    return old_minetest_get_player_by_name(name)
       or
       old_minetest_get_player_by_name(
-         case_insensitive_name_mapping[name:lower()]
+         case_insensitive_name_mapping[name:lower()] or ""
       )
 end
 
