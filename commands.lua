@@ -98,3 +98,28 @@ minetest.register_chatcommand(
       end
    }
 )
+
+if minetest.get_modpath("simplecrafting_lib") then
+
+   minetest.register_chatcommand(
+      "factory_recipes",
+      {
+         params = "<name>",
+         description = "Shows the recipes of a factory.",
+         func = function(sender, param)
+            local player = minetest.get_player_by_name(sender)
+            if not player then
+               return
+            end
+
+            if not param or param == "" then
+               return false, "Please specify a factory."
+            end
+
+            param = param:lower():gsub(" ", "_")
+
+            simplecrafting_lib.show_crafting_guide(param, player)
+         end
+      }
+   )
+end
