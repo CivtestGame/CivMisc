@@ -55,9 +55,9 @@ minetest.register_on_mods_loaded(function()
       register_alias("night", "settime 18:00")
 
       register_alias("gc", "group create")
-      register_alias("ga", "group add")
       register_alias("gr", "group remove")
-      register_alias("gi", "group info")
+      register_alias("g", "group info")
+      register_alias("gi", "group invite")
       register_alias("gl", "group list")
 
       register_alias("ppl", "pplocate")
