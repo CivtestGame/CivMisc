@@ -5,7 +5,7 @@ local function enable_citadella_for_containers()
    -- global: containers should be Citadella aware.
 
    local containers = {
-      "xdecor:mailbox", "default:bookshelf", "xdecor:multishelf", "xdecor:cabinet_half",
+      "xdecor:mailbox", "xdecor:multishelf", "xdecor:cabinet_half",
       "xdecor:empty_shelf", "xdecor:cabinet", "bones:bones", "citadella:chest"
    }
 
@@ -22,7 +22,7 @@ local function enable_prisonpearl_tracking_for_containers()
   -- global: containers should be PrisonPearl aware.
    local containers = {
       "xdecor:hive", "xdecor:enchantment_table", "xdecor:mailbox", "xdecor:workbench",
-      "xdecor:itemframe", "default:bookshelf", "factory_mod:burner", "factory_mod:smelter",
+      "xdecor:itemframe", "factory_mod:burner", "factory_mod:smelter",
       "factory_mod:advanced_smelter", "xdecor:multishelf", "xdecor:cabinet_half",
       "xdecor:empty_shelf", "xdecor:cabinet", "xdecor:workbench", "bones:bones",
       "citadella:furnace", "citadella:chest"
