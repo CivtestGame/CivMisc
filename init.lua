@@ -31,6 +31,8 @@ local onetimetp = dofile(modpath .. "onetimetp.lua")
 
 local case_insensitivity = dofile(modpath .. "case_insensitivity.lua")
 
+local oreofix = dofile(modpath .. "oreofix.lua")
+
 local ie = minetest.request_insecure_environment() or
    error("CivMisc requires decreased security settings in minetest.conf")
 
