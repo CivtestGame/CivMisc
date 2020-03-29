@@ -34,17 +34,18 @@ local case_insensitivity = dofile(modpath .. "case_insensitivity.lua")
 local oreofix = dofile(modpath .. "oreofix.lua")
 
 local ie = minetest.request_insecure_environment() or
-   error("CivMisc requires decreased security settings in minetest.conf")
+   error("CivMisc needs to be a trusted mod. "
+            .."Add it to `secure.trusted_mods` in minetest.conf")
 
-fennel = ie.require("fennel")
-if fennel then
+local fennel_exists, fennel_lib = pcall(ie.require, "fennel")
+if fennel_exists then
+   fennel = fennel_lib
    fennel.dofile(modpath .. "test.fnl")
 end
 
-local jeejah = ie.require("jeejah")
+local jeejah_exists, jeejah = pcall(ie.require, "jeejah")
 local jeejah_port = tonumber(minetest.settings:get("civmisc_jeejah_port"))
-
-if jeejah and jeejah_port then
+if jeejah_exists and jeejah_port then
    local coro = jeejah.start(jeejah_port, { debug = true } )
    --
    -- Ouch. Tying the coroutine.resume to the globalstep means that jeejah is
