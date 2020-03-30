@@ -2,6 +2,7 @@
 --Idea:add gate block which only allows players with specific items in
 
 local perm_table = {}
+local invite_tabe = {}
 
 local function disallow(name)
     perm_table[name] = nil
@@ -44,10 +45,12 @@ local function use(itemstack, user, pointed_thing)
             minetest.show_formspec(user:get_player_name(), "inv_inspection", get_inv_formspec(target_name,inv_name))
             minetest.chat_send_player(target_name, user:get_player_name() .. " is inspecting your inventory.")
             perm_table[target_name] = nil
+            itemstack:take_item()
+            return itemstack
         else
-            
             minetest.chat_send_player(user:get_player_name(), target_name .. " has not allowed you to inspect their inventory.")
-            minetest.chat_send_player(target_name, user:get_player_name() .. " tried to inspect your inventory, but you have not allowed it.")
+            minetest.chat_send_player(target_name, user:get_player_name() .. " tried to inspect your inventory, but you have not allowed it. Use /allow_inspection to allow it.")
+            invite_tabe[target_name] = user:get_player_name()
         end
     end
 end
@@ -65,16 +68,15 @@ minetest.register_chatcommand(
       func = function(sender, params)
         local splitResult = params:split(" ")
         local target = splitResult[1]
-        local time = tonumber(splitResult[2]) or 10
-        f_util.debug(params)
-        f_util.debug(target)
-        f_util.debug(time)
+        if target == nil then target = invite_tabe[sender] end
+        local time = tonumber(splitResult[2]) or 30
         if minetest.get_player_by_name(sender) then
             if time < 1 then time = 1 end --Don't know if it's required, but just want to be sure.
+            if time > 600 then time = 600 end
             minetest.after(time, disallow, sender)
-            if target == "" then
-                perm_table[sender] = true
-                minetest.chat_send_player(sender, "Anyone can now inspect your inventory for the next " .. time .. " seconds")
+            if target == nil then
+                minetest.chat_send_player(sender, "No target specified")
+                return false
             else
                 minetest.chat_send_player(sender, target .. " can now inspect your inventory for the next " .. time .. " seconds")
                 perm_table[sender] = target
