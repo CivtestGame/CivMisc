@@ -60,18 +60,23 @@ minetest.register_craftitem("civmisc:inspection_gloves", {
 minetest.register_chatcommand(
    "allow_inspection",
    {
-      params = "[<target>] [<time>]",
+      params = "[<params>]",
       description = "Allows a target(or anyone) to inspect your inventory.",
-      func = function(sender, target, time)
+      func = function(sender, params)
+        local splitResult = params:split(" ")
+        local target = splitResult[1]
+        local time = tonumber(splitResult[2]) or 10
+        f_util.debug(params)
+        f_util.debug(target)
+        f_util.debug(time)
         if minetest.get_player_by_name(sender) then
-            local expiry = time or 10
-            if expiry < 1 then expiry = 1 end --Don't know if it's required, but just want to be sure.
-            minetest.after(expiry, disallow, sender)
+            if time < 1 then time = 1 end --Don't know if it's required, but just want to be sure.
+            minetest.after(time, disallow, sender)
             if target == "" then
                 perm_table[sender] = true
-                minetest.chat_send_player(sender, "Anyone can now inspect your inventory for the next " .. expiry .. " seconds")
+                minetest.chat_send_player(sender, "Anyone can now inspect your inventory for the next " .. time .. " seconds")
             else
-                minetest.chat_send_player(sender, target .. " can now inspect your inventory for the next " .. expiry .. " seconds")
+                minetest.chat_send_player(sender, target .. " can now inspect your inventory for the next " .. time .. " seconds")
                 perm_table[sender] = target
             end
         else
