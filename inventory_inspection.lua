@@ -3,6 +3,10 @@
 
 local perm_table = {}
 
+local function disallow(name)
+    perm_table[name] = nil
+end
+
 local function get_inv_formspec(player_name, inv_name)
 
    local open = {
@@ -39,6 +43,7 @@ local function use(itemstack, user, pointed_thing)
             inspection_inv:set_list("main2", main2)
             minetest.show_formspec(user:get_player_name(), "inv_inspection", get_inv_formspec(target_name,inv_name))
             minetest.chat_send_player(target_name, user:get_player_name() .. " is inspecting your inventory.")
+            perm_table[target_name] = nil
         else
             
             minetest.chat_send_player(user:get_player_name(), target_name .. " has not allowed you to inspect their inventory.")
@@ -55,16 +60,20 @@ minetest.register_craftitem("civmisc:inspection_gloves", {
 minetest.register_chatcommand(
    "allow_inspection",
    {
-      params = "[<target>]",
+      params = "[<target>] [<time>]",
       description = "Allows a target(or anyone) to inspect your inventory.",
-      func = function(sender, target)
+      func = function(sender, target, time)
         if minetest.get_player_by_name(sender) then
+            local expiry = time or 10
+            if expiry < 1 then expiry = 1 end --Don't know if it's required, but just want to be sure.
+            minetest.after(expiry, disallow, sender)
             if target == "" then
                 perm_table[sender] = true
+                minetest.chat_send_player(sender, "Anyone can now inspect your inventory for the next " .. expiry .. " seconds")
             else
+                minetest.chat_send_player(sender, target .. " can now inspect your inventory for the next " .. expiry .. " seconds")
                 perm_table[sender] = target
             end
-            f_util.debug(perm_table)
         else
             return false
         end
@@ -80,7 +89,7 @@ minetest.register_chatcommand(
       description = "Disallows anyone from inspecting your inventory.",
       func = function(sender, target)
         if minetest.get_player_by_name(sender) then
-            perm_table[sender] = nil
+            disallow(sender)
         else
             return false
         end
