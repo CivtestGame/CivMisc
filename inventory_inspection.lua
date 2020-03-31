@@ -58,7 +58,7 @@ end
 minetest.register_craftitem("civmisc:inspection_gloves", {
     description = "Inspection gloves",
     on_use = use,
-    inventory_image = "gloves.jpg"
+    inventory_image = "gloves.png"
 })
 
 minetest.register_chatcommand(
