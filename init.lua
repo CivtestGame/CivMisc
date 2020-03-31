@@ -33,7 +33,9 @@ local case_insensitivity = dofile(modpath .. "case_insensitivity.lua")
 
 local oreofix = dofile(modpath .. "oreofix.lua")
 
-local oreofix = dofile(modpath .. "inventory_inspection.lua")
+local inventory_inspection = dofile(modpath .. "inventory_inspection.lua")
+
+local inadequate_tool = dofile(modpath .. "inadequate_tool.lua")
 
 local ie = minetest.request_insecure_environment() or
    error("CivMisc needs to be a trusted mod. "
