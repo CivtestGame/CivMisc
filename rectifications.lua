@@ -4,6 +4,10 @@
 local function enable_citadella_for_containers()
    -- global: containers should be Citadella aware.
 
+   if not minetest.get_modpath("citadella") then
+       return
+   end
+
    local containers = {
       "xdecor:mailbox", "xdecor:multishelf", "xdecor:cabinet_half",
       "xdecor:empty_shelf", "xdecor:cabinet", "bones:bones", "citadella:chest"
@@ -20,6 +24,9 @@ end
 
 local function enable_prisonpearl_tracking_for_containers()
   -- global: containers should be PrisonPearl aware.
+   if not minetest.get_modpath("prisonpearl") then
+       return
+   end
    local containers = {
       "xdecor:hive", "xdecor:enchantment_table", "xdecor:mailbox", "xdecor:workbench",
       "xdecor:itemframe", "factory_mod:burner", "factory_mod:smelter",

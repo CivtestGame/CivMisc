@@ -26,6 +26,9 @@ local function register_alias(alias, command)
    local cname = c_split[1]
    local cargs = c_split[2] or ""
 
+   if minetest.chatcommands[cname] == nil then
+       return
+   end
    minetest.chatcommands[alias] = table.copy(minetest.chatcommands[cname])
 
    local old_func = minetest.chatcommands[alias].func
