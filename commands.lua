@@ -63,6 +63,7 @@ minetest.register_on_mods_loaded(function()
       register_alias("ppl", "pplocate")
 
       register_alias("pm", "msg")
+      register_alias("tell", "msg")
 
       -- we have a more flexible /kill above
       minetest.unregister_chatcommand("killme")
