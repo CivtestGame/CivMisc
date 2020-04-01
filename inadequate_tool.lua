@@ -9,6 +9,10 @@ minetest.register_on_punchnode(function(pos, node, puncher, pointed_thing)
    local held = puncher:get_wielded_item()
    local held_def = core.registered_items[held:get_name()]
 
+   if not held_def then
+      return
+   end
+
    if (has_citadella and ct.player_modes[pname])
       or held:get_name():find("sword")
    then
