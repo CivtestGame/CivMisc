@@ -110,7 +110,7 @@ local function random_spawn(player)
       pname)
 end
 
-
+local has_prisonpearl = minetest.get_modpath("prisonpearl")
 
 -- This code depends on hbhunger
 minetest.register_on_mods_loaded(function()
@@ -130,6 +130,13 @@ minetest.register_on_mods_loaded(function()
       minetest.register_on_respawnplayer(function(player)
             local pname = player:get_player_name()
             local pos = beds.spawn[pname]
+            local player_has_cell
+
+            if has_prisonpearl and pp.player_has_cell_core(pname) then
+               -- PrisonPearl handles the respawn of cell prisoners
+               return
+            end
+
             if pos and player_can_respawn_on_bed(player) then
                local node = get_far_node(pos)
                local node_name = node.name
