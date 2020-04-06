@@ -3,7 +3,7 @@ local modpath = minetest.get_modpath(minetest.get_current_modname())
 
 
 minetest.register_on_joinplayer(function(player)
-      player:hud_set_flags({ minimap = true, minimap_radar = true })
+      player:hud_set_flags({ minimap = true, minimap_radar = false })
 end)
 
 
