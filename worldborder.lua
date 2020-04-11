@@ -71,7 +71,7 @@ end)
 
 -- Don't allow block modification outside of the border.
 local old_is_protected = minetest.is_protected
-function minetest.is_protected(pos, name)
+function minetest.is_protected(pos, name, action)
    if not position_in_world_border(pos) then
       minetest.chat_send_player(name, "You can't modify blocks beyond the border.")
       return true
@@ -80,7 +80,7 @@ function minetest.is_protected(pos, name)
       minetest.chat_send_player(name, "You can't modify blocks at this y-level.")
       return true
    end
-   return old_is_protected(pos, name)
+   return old_is_protected(pos, name, action)
 end
 
 
