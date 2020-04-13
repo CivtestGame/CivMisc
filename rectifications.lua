@@ -87,7 +87,7 @@ local function enable_diggable_containers()
       "xdecor:itemframe", "default:bookshelf",
       "xdecor:multishelf",
       "xdecor:cabinet_half", "xdecor:empty_shelf", "xdecor:cabinet", "xdecor:workbench",
-      "bones:bones", "vessels:shelf", "citadella:chest",
+      "bones:bones", "vessels:shelf", "citadella:chest", "default:chest",
       "fancy_vend:player_vendor"
    }
 
