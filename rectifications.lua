@@ -29,11 +29,19 @@ local function enable_prisonpearl_tracking_for_containers()
    end
    local containers = {
       "xdecor:hive", "xdecor:enchantment_table", "xdecor:mailbox", "xdecor:workbench",
-      "xdecor:itemframe", "factory_mod:burner", "factory_mod:smelter",
-      "factory_mod:advanced_smelter", "xdecor:multishelf", "xdecor:cabinet_half",
+      "xdecor:itemframe",
+      "xdecor:multishelf", "xdecor:cabinet_half",
       "xdecor:empty_shelf", "xdecor:cabinet", "xdecor:workbench", "bones:bones",
       "citadella:furnace", "citadella:chest"
    }
+
+   for k,_ in pairs(simplecrafting_lib.type) do
+      local node_name = "civindustry:" .. k
+      local node_def = minetest.registered_nodes[node_name]
+      if node_def then
+         containers[#containers + 1] = node_name
+      end
+   end
 
    for _,name in ipairs(containers) do
       local olddef = core.registered_nodes[name]
@@ -76,12 +84,20 @@ local function enable_diggable_containers()
    -- players placing indestructible nodes. EVER.
    local sinners = {
       "xdecor:hive", "xdecor:enchantment_table", "xdecor:mailbox", "xdecor:workbench",
-      "xdecor:itemframe", "default:bookshelf", "factory_mod:burner", "factory_mod:smelter",
-      "factory_mod:advanced_smelter", "factory_mod:exceptional_smelter", "xdecor:multishelf",
+      "xdecor:itemframe", "default:bookshelf",
+      "xdecor:multishelf",
       "xdecor:cabinet_half", "xdecor:empty_shelf", "xdecor:cabinet", "xdecor:workbench",
       "bones:bones", "vessels:shelf", "citadella:chest",
       "fancy_vend:player_vendor"
    }
+
+   for k,_ in pairs(simplecrafting_lib.type) do
+      local node_name = "civindustry:" .. k
+      local node_def = minetest.registered_nodes[node_name]
+      if node_def then
+         sinners[#sinners + 1] = node_name
+      end
+   end
 
    for _,name in ipairs(sinners) do
       local olddef = core.registered_nodes[name]
