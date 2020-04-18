@@ -265,7 +265,6 @@ if minetest.get_modpath("citadella") then
          label = "default:chest fixer",
          name = "civmisc:chest_fixer",
          nodenames = { "default:chest", "default:chest_locked" },
-         run_at_every_load = true,
          action = function(pos, node)
             local old_meta = minetest.get_meta(pos)
             local old_inv = old_meta:get_inventory()
