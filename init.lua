@@ -39,6 +39,8 @@ local inadequate_tool = dofile(modpath .. "inadequate_tool.lua")
 
 local torchlight = dofile(modpath .. "torchlight.lua")
 
+local healthtweaks = dofile(modpath .. "healthtweaks.lua")
+
 local ie = minetest.request_insecure_environment() or
    error("CivMisc needs to be a trusted mod. "
             .."Add it to `secure.trusted_mods` in minetest.conf")
