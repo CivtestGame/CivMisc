@@ -51,7 +51,7 @@ minetest.register_chatcommand(
                "\nBefore using /teleport_request, please note:\n "
                   .. " 1. You can only teleport once using this command.\n "
                   .. " 2. Your ability to teleport expires in "..mins.." minutes.\n "
-                  .. " 3. Your inventory will be dropped before you teleport.\n"
+                  .. " 3. There are limits on what you can take with you.\n"
             )
             if params ~= "" then
                minetest.chat_send_player(
@@ -94,7 +94,8 @@ minetest.register_chatcommand(
 -- transport them.
 local INVALID_ITEMS = {
    "tin", "copper", "bronze", "iron", "steel", "obsidian", "gold", "tnt",
-   "lava", "mese", "diamond", "mithril", "bucket", "coke", "smelter"
+   "lava", "mese", "diamond", "mithril", "bucket", "coke", "smelter",
+   "fortress", "stronghold", "civindustry"
 }
 
 -- Newfriends shouldn't be able to bring large amounts of stuff with them.
