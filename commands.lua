@@ -65,6 +65,9 @@ minetest.register_on_mods_loaded(function()
 
       register_alias("ppl", "pplocate")
 
+      register_alias("fr", "factory_recipes")
+      register_alias("fw", "factory_which")
+
       register_alias("pm", "msg")
       register_alias("tell", "msg")
 
@@ -126,4 +129,76 @@ if minetest.get_modpath("simplecrafting_lib") then
          end
       }
    )
+
+   minetest.register_chatcommand(
+      "factory_recipes",
+      {
+         params = "<name>",
+         description = "Shows the recipes of a factory.",
+         func = function(sender, param)
+            local player = minetest.get_player_by_name(sender)
+            if not player then
+               return
+            end
+
+            if not param or param == "" then
+               return false, "Please specify a factory."
+            end
+
+            param = param:lower():gsub(" ", "_")
+
+            simplecrafting_lib.show_crafting_guide(param, player)
+         end
+      }
+   )
+
+   local function get_output_factories(search_filter)
+      local sf2 = search_filter:lower():gsub(" ", "_")
+
+      local outputs = {}
+      for factory_name, factory_def in pairs(simplecrafting_lib.type) do
+         for item, recipes in pairs(factory_def.recipes_by_out) do
+            local item_def = minetest.registered_items[item]
+            if item_def then
+               if string.find(item:lower(), search_filter)
+                  or string.find(item:lower(), sf2)
+                  or string.find((item_def.description):lower(), search_filter)
+                  or string.find((item_def.description):lower(), sf2)
+               then
+                  table.insert(outputs, factory_name)
+               end
+            end
+         end
+      end
+
+      -- TODO: sorting option
+      table.sort(outputs)
+
+      return outputs
+   end
+
+   minetest.register_chatcommand(
+      "factory_which",
+      {
+         params = "<name>",
+         description = "Finds the factories that output a particular item.",
+         func = function(sender, param)
+            local player = minetest.get_player_by_name(sender)
+            if not player then
+               return
+            end
+
+            if not param or param == "" then
+               return false, "Please specify an item."
+            end
+
+            local factories = table.concat(get_output_factories(param), ", ")
+
+            minetest.chat_send_player(
+               player:get_player_name(), "Factories: " .. factories
+            )
+         end
+      }
+   )
+
 end
