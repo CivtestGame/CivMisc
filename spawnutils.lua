@@ -170,21 +170,27 @@ Come and get involved in our community!
    Discord: https://discord.gg/DHEbhDF
 ]]
 
+-- Spawn book creation popped up in the profiler, so here's an optimisation
+local memoised_spawn_book
+
 minetest.register_on_newplayer(function(player)
+      if not memoised_spawn_book then
+         local book = ItemStack("default:book_written")
+         local data = book:get_meta():to_table().fields
 
-      local book = ItemStack("default:book_written")
-      local data = book:get_meta():to_table().fields
+         data.title = "Civtest Starter Guide (0.2)"
+         data.description = "\"Civtest Starter Guide (0.2)\" by R3"
+         data.text = book_text
+         data.owner = "R3"
+         data.page = 1
+         data.page_max = 1
 
-      data.title = "Civtest Starter Guide (0.2)"
-      data.description = "\"Civtest Starter Guide (0.2)\" by R3"
-      data.text = book_text
-      data.owner = "R3"
-      data.page = 1
-      data.page_max = 1
+         book:get_meta():from_table({ fields = data })
+         memoised_spawn_book = book
+         minetest.log("[CivMisc] Spawn book memoised.")
+      end
 
-      book:get_meta():from_table({ fields = data })
-
-      player_api.give_item(player, book)
+      player_api.give_item(player, memoised_spawn_book)
       player_api.give_item(player, "default:torch 10")
       player_api.give_item(player, "default:blueberries 5")
       player_api.give_item(player, "default:apple 2")
