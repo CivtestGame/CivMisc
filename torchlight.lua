@@ -127,3 +127,65 @@ minetest.register_globalstep(function(dtime)
     end
 end)
 
+-- Glowstick, adapted from Nightscapes mod by Darkflame999 https://forum.minetest.net/viewtopic.php?f=9&t=24555
+
+minetest.register_entity("civmisc:glowstick_entity", {
+	initial_properties = {
+		hp_max = 1,
+		physical = true,
+		collisionbox = {-0.14, -0.14, -0.14, 0.14, 0.14, 0.14},
+		visual = "sprite",
+		visual_size = {x=0.6, y=0.6},
+		textures = {"civmisc_glowstick.png"},
+		spritediv = {x=1, y=1},
+		initial_sprite_basepos = {x=0, y=0},
+		is_visible = "true",
+		timer = 0,
+		physical = true,
+		collide_with_objects = true,
+	},
+	on_activate = function(self, staticdata, dtime_s)
+		last_pos = self.object:get_pos()
+	end,
+	last_pos = {x=-1, y=-1, z=-1},
+	on_step = function(self, dtime)
+		temp = self.object:getpos()
+		if self.last_pos.y ~= temp.y then
+			minetest.set_node(self.last_pos, {name="air"})
+			self.last_pos = temp
+			minetest.set_node(self.last_pos, {name = "civmisc:torchlight"})
+		end
+		node = minetest.get_node({x=self.last_pos.x, y=self.last_pos.y-0.3, z=self.last_pos.z})
+		if minetest.registered_nodes[node.name].walkable then
+			self.object:setvelocity({x=0, y=-2, z=0})
+			self.object:setacceleration({x=0, y=-10, z=0})
+		end
+	end,
+	on_punch = function(self, hitter)
+		nodes_in_area = minetest.find_nodes_in_area({x=self.last_pos.x-1, y=self.last_pos.y-1, z=self.last_pos.z-1}, {x=self.last_pos.x+1, y=self.last_pos.y+1, z=self.last_pos.z+1}, {"civmisc:torchlight"})
+		for i=1, table.getn(nodes_in_area) do
+			minetest.set_node(nodes_in_area[i], {name = "air"})
+		end
+		hitter:get_inventory():add_item("main", "civmisc:glowstick")
+	end,
+})
+minetest.register_craftitem("civmisc:glowstick", {
+	description = "Glowstick",
+	inventory_image = "civmisc_glowstick.png",
+	on_drop = function(itemstack, dropper, pos)
+		obj = minetest.add_entity({x=pos.x, y=pos.y+1.3, z=pos.z}, "civmisc:glowstick_entity")
+		dir = dropper:get_look_dir()
+		obj:setvelocity({x=dir.x*12, y=dir.y*10, z=dir.z*12})
+		obj:setacceleration({x=dir.x*-3, y=-10, z=dir.z*-3})
+		itemstack:take_item()
+		return itemstack
+	end,
+})
+minetest.register_craft({
+	output = "civmisc:glowstick",
+	recipe = {
+		{"", "default:glass", "group:coal"},
+		{"default:glass", "default:quicklime", "default:glass"},
+		{"group:coal", "default:glass", ""},
+		},
+})
