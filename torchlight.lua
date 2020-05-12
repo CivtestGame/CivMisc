@@ -166,7 +166,9 @@ minetest.register_entity("civmisc:glowstick_entity", {
 		for i=1, table.getn(nodes_in_area) do
 			minetest.set_node(nodes_in_area[i], {name = "air"})
 		end
-		hitter:get_inventory():add_item("main", "civmisc:glowstick")
+		if hitter:is_player() then
+			hitter:get_inventory():add_item("main", "civmisc:glowstick")
+		end
 	end,
 })
 minetest.register_craftitem("civmisc:glowstick", {
