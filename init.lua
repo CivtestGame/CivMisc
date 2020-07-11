@@ -37,7 +37,7 @@ local inventory_inspection = dofile(modpath .. "inventory_inspection.lua")
 
 local inadequate_tool = dofile(modpath .. "inadequate_tool.lua")
 
-local torchlight = dofile(modpath .. "torchlight.lua")
+-- local torchlight = dofile(modpath .. "torchlight.lua")
 
 local healthtweaks = dofile(modpath .. "healthtweaks.lua")
 
