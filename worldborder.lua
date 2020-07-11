@@ -99,8 +99,8 @@ if boats_loaded then
 
    -- Stop boats from exceeding the world border
    local old_boat_on_step = minetest.registered_entities["boats:boat"].on_step
-   minetest.registered_entities["boats:boat"].on_step = function(self, dtime)
-      old_boat_on_step(self, dtime)
+   minetest.registered_entities["boats:boat"].on_step = function(self, dtime, ...)
+      old_boat_on_step(self, dtime, ...)
       local pos = self.object:get_pos()
       if not position_in_world_border(pos) then
          local new_pos = get_closest_position_in_world_border(pos)
