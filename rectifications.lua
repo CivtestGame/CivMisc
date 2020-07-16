@@ -78,7 +78,8 @@ end
 
 local function enable_diggable_containers()
    -- global: containers should always be breakable, and should always drop
-   --         their contents.
+   --         their contents, and should not allow transfer of items with the
+   --         'undroppable' group.
    --
    -- We prioritise this at all costs, even if it's hamfisted; we NEVER want
    -- players placing indestructible nodes. EVER.
@@ -138,6 +139,36 @@ local function enable_diggable_containers()
             end
             minetest.handle_node_drops(pos, drops, digger)
          end
+
+         local old_amip = def.allow_metadata_inventory_put
+         def.allow_metadata_inventory_put = function(pos, listname, index,
+                                                     stack, player)
+            local idef = stack:get_definition()
+            if idef and idef.groups and idef.groups.undroppable then
+               return 0
+            end
+            if old_amip then
+               return old_amip(pos, listname, index, stack, player)
+            else
+               return stack:get_count()
+            end
+         end
+
+         local old_amit = def.allow_metadata_inventory_take
+         def.allow_metadata_inventory_take = function(pos, listname, index,
+                                                      stack, player)
+            local idef = stack:get_definition()
+            if idef and idef.groups and idef.groups.undroppable then
+               return 0
+            end
+
+            if old_amit then
+               return old_amit(pos, listname, index, stack, player)
+            else
+               return stack:get_count()
+            end
+         end
+
          minetest.register_node(":" .. name, def)
       end
    end
