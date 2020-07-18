@@ -62,6 +62,7 @@ minetest.register_on_mods_loaded(function()
       register_alias("g", "group info")
       register_alias("gi", "group invite")
       register_alias("gl", "group list")
+      register_alias("ga", "group accept")
 
       register_alias("ppl", "pplocate")
 
