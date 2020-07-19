@@ -4,10 +4,13 @@
 
 local has_citadella = minetest.get_modpath("citadella")
 
+local already_spammed = {}
+
 minetest.register_on_punchnode(function(pos, node, puncher, pointed_thing)
    local pname = puncher:get_player_name()
    local held = puncher:get_wielded_item()
-   local held_def = core.registered_items[held:get_name()]
+   local held_name = held:get_name()
+   local held_def = core.registered_items[held_name]
 
    if not held_def then
       return
@@ -18,6 +21,14 @@ minetest.register_on_punchnode(function(pos, node, puncher, pointed_thing)
    then
       return
    end
+
+   already_spammed[pname] = already_spammed[pname] or {}
+
+   if already_spammed[pname][held_name] then
+      return
+   end
+
+   already_spammed[pname][held_name] = true
 
    local node_def = core.registered_nodes[node.name]
    local node_level = (node_def
