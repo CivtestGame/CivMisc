@@ -24,11 +24,11 @@ minetest.register_on_punchnode(function(pos, node, puncher, pointed_thing)
 
    already_spammed[pname] = already_spammed[pname] or {}
 
-   if already_spammed[pname][held_name] then
+   if already_spammed[pname][node.name] then
       return
    end
 
-   already_spammed[pname][held_name] = true
+   already_spammed[pname][node.name] = true
 
    local node_def = core.registered_nodes[node.name]
    local node_level = (node_def
