@@ -26,7 +26,8 @@ minetest.register_globalstep(function(dtime)
              -- We limit this behaviour to items older than 2 seconds to avoid
              -- picking up items that have only just been dropped.
              local entity = obj:get_luaentity()
-             if entity.name == "__builtin:item"
+             if entity
+                and entity.name == "__builtin:item"
                 and entity.age > 2
              then
                 entity:on_punch(player)
