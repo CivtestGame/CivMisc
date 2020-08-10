@@ -98,6 +98,11 @@ local function enable_diggable_containers()
       if node_def then
          sinners[#sinners + 1] = node_name
       end
+      local node_name_active = node_name .. "_active"
+      local node_def_active = minetest.registered_nodes[node_name_active]
+      if node_def_active then
+         sinners[#sinners + 1] = node_name_active
+      end
    end
 
    for _,name in ipairs(sinners) do
