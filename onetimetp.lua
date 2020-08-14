@@ -1,22 +1,32 @@
 
 local ONE_TIME_TP_PERIOD = 60 * 60 -- 60 mins
 
+local function welcome_player(pname)
+   local player = minetest.get_player_by_name(pname)
+   if not player then
+      minetest.remove_player(pname)
+      minetest.remove_player_auth(pname)
+      return
+   end
+
+   local meta = player:get_meta()
+   local time = os.time(os.date("!*t"))
+   meta:set_int("onetimetp", time)
+
+   minetest.chat_send_player(
+      pname, "Your one-time teleport is available!\n"
+      .. "   See `/teleport_request` for more information."
+   )
+   minetest.chat_send_all(
+      pname .. " joined the server for the first time!"
+   )
+end
+
 minetest.register_on_newplayer(function(player)
+      -- The player may have been kicked on-join by the association
+      -- plugin. Slightly delay doing anything.
       local pname = player:get_player_name()
-      local meta = player:get_meta()
-      local time = os.time(os.date("!*t"))
-      meta:set_int("onetimetp", time)
-      minetest.after(3,
-         function()
-            minetest.chat_send_player(
-               pname, "Your one-time teleport is available!\n"
-                  .. "   See `/teleport_request` for more information."
-            )
-         end
-      )
-      minetest.chat_send_all(
-         pname .. " joined the server for the first time!"
-      )
+      minetest.after(3, welcome_player, pname)
 end)
 
 local teleport_requests = {}
