@@ -298,9 +298,9 @@ end)
 -- Transform all chests into Citadella ones.
 if minetest.get_modpath("citadella") then
    minetest.register_lbm({
-         label = "default:chest fixer",
+         label = "civmisc:chest fixer",
          name = "civmisc:chest_fixer2",
-         nodenames = { "default:chest", "default:chest_locked" },
+         nodenames = { "default:chest" },
          action = function(pos, node)
             local old_meta = minetest.get_meta(pos)
             local old_inv = old_meta:get_inventory()
@@ -316,6 +316,29 @@ if minetest.get_modpath("citadella") then
             new_inv:set_list("main", old_invlist_main)
          end
    })
+
+   minetest.register_lbm({
+         label = "civmisc:chest locked fixer",
+         name = "civmisc:chest_locked_fixer",
+         nodenames = { "default:chest_locked" },
+         run_at_every_load = true,
+         action = function(pos, node)
+            local old_meta = minetest.get_meta(pos)
+            local old_inv = old_meta:get_inventory()
+
+            local old_invlist_main = table.copy(old_inv:get_list("main"))
+
+            minetest.remove_node(pos)
+            minetest.set_node(
+               pos, { name = "citadella:chest", param1 = 0, param2 = 0}
+            )
+            local new_meta = minetest.get_meta(pos)
+            local new_inv = new_meta:get_inventory()
+            new_inv:set_list("main", old_invlist_main)
+            new_inv:add_item("main", "default:steel_ingot")
+         end
+   })
+
    minetest.log(
       "[CivMisc] default:chest --> citadella:chest transformer LBM is active!"
    )
