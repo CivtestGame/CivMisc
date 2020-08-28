@@ -85,7 +85,7 @@ minetest.register_craftitem(
 minetest.register_chatcommand(
    "allow_inspection",
    {
-      params = "[<target>]",
+      params = "<target> [<time (seconds)>]",
       description = "Allows a target (or anyone) to inspect your inventory.",
       func = function(sender, params)
          local player = minetest.get_player_by_name(sender)
