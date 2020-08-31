@@ -198,5 +198,147 @@ minetest.register_on_newplayer(function(player)
       random_spawn(player)
 end)
 
+--------------------------------------------------------------------------------
+-- Newbie setup formspecs:
+--  * Allow them to select inventory mode.
+--------------------------------------------------------------------------------
+
+local newbie_formspecs = {} -- List
+local newbie_formspecs_check = {} -- Table
+
+local newbie_formspec_idxs = {} -- Table
+
+function civmisc.register_newbie_formspec(def)
+   def.formname = def.formname
+      or error("register_newbie_formspec: no formname defined.")
+   -- def.fields = def.fields
+   --    or error("register_newbie_formspec: no fields array defined.")
+   def.func = def.func
+      or error("register_newbie_formspec: no func defined.")
+
+   local old_func = def.func
+   def.func = function(player)
+      local fs = old_func(player)
+      minetest.show_formspec(player:get_player_name(), def.formname, fs)
+   end
+
+   newbie_formspecs[#newbie_formspecs + 1] = def
+   newbie_formspecs_check[def.formname] = true
+end
+
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+      local newbie_fs_def = newbie_formspecs_check[formname]
+      if not newbie_fs_def then
+         return
+      end
+
+      if not fields["quit"] then
+         return
+      end
+
+      local pname = player:get_player_name()
+
+      if not newbie_formspec_idxs[pname] then
+         return
+      end
+
+      newbie_formspec_idxs[pname] = newbie_formspec_idxs[pname] + 1
+
+      if newbie_formspec_idxs[pname] > #newbie_formspecs then
+         newbie_formspec_idxs[pname] = nil
+      else
+         newbie_formspecs[newbie_formspec_idxs[pname]].func(player)
+      end
+end)
+
+function civmisc.trigger_newbie_formspecs(player)
+   local pname = player:get_player_name()
+   newbie_formspec_idxs[pname] = newbie_formspec_idxs[pname] or 1
+   newbie_formspecs[newbie_formspec_idxs[pname]].func(player)
+end
+
+-- DEVMODE: minetest.register_on_joinplayer(civmisc.trigger_newbie_formspecs)
+minetest.register_on_newplayer(civmisc.trigger_newbie_formspecs)
+
+--------------------------------------------------------------------------------
+-- Newbie inventory mode setting
+--------------------------------------------------------------------------------
+
+local function show_inventory_mode_formspec(player)
+   local pname = player:get_player_name()
+   local fs_tab = {
+      "size[7,4]",
+      "label[0,0;Welcome to Civtest, ", pname, "!]",
+      "label[0,0.75;This is a brief setup to help you get started.]",
+      "label[0,2;Which game are you more familiar with?]",
+      "button_exit[1,3;2,1;mc;Minecraft]",
+      "button_exit[4,3;2,1;mt;Minetest]",
+   }
+
+   return table.concat(fs_tab)
+end
+
+civmisc.register_newbie_formspec(
+   {
+      formname = "civmisc:inventory_mode_fs",
+      func = show_inventory_mode_formspec,
+   }
+)
+
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+      if formname ~= "civmisc:inventory_mode_fs" then
+         return
+      end
+
+      if not fields["quit"] then
+         return
+      end
+
+      local meta = player:get_meta()
+      if fields["mc"] then
+         meta:set_string("sfinv:inventory_type", "minecraft")
+      elseif fields["mt"] then
+         meta:set_string("sfinv:inventory_type", "minetest")
+      end
+      sfinv.set_player_inventory_formspec(player)
+
+      local pname = player:get_player_name()
+      local new_mode = meta:get_string("sfinv:inventory_type")
+      minetest.chat_send_player(
+         pname, "Inventory mode switched to: " .. new_mode:upper() .. "\n"
+            .. "You can toggle it with '/inventory_mode'."
+      )
+end)
+
+--------------------------------------------------------------------------------
+-- Final newbie formspec
+--------------------------------------------------------------------------------
+
+local function show_final_formspec(player)
+   local pname = player:get_player_name()
+   local fs_tab = {
+      "size[6,5]",
+      "label[0,0;All done, ", pname, ". Your inventory is ready.]",
+      "label[0,1;We've given you some basic supplies, and a] ",
+      "label[0,1.5;Starter Guide to help you on your way.]",
+      "label[0,2;We hope you enjoy Civtest!]",
+      "label[1,3;Good luck on your adventure!]",
+      "button_exit[2,4;2,1;exit;OK]",
+   }
+
+   return table.concat(fs_tab)
+end
+
+
+minetest.register_on_mods_loaded(function()
+      civmisc.register_newbie_formspec(
+         {
+            formname = "civmisc:final_fs",
+            func = show_final_formspec,
+         }
+      )
+end)
+
+--------------------------------------------------------------------------------
 
 minetest.debug("[CivMisc] SpawnUtils initialised.")

@@ -1,6 +1,8 @@
 -- Load config parameters
 local modpath = minetest.get_modpath(minetest.get_current_modname()) .. "/"
 
+civmisc = {}
+
 minetest.debug("CivMisc initializing...")
 
 local groundcollect = dofile(modpath .. "groundcollect.lua")
@@ -69,3 +71,5 @@ if jeejah_exists and jeejah_port then
 end
 
 minetest.debug("CivMisc initialised.")
+
+return civmisc
